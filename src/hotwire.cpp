@@ -58,10 +58,10 @@ void Hotwire::init(){
 	    element_making(buffer_ref, sf::Vector2f(mouse.getPosition().x - WS_BAR_W - 40, mouse.getPosition().y  - 25), amountOfBatteries, counter);
 	});
 
-    boxIN->Pack(image_map["bell"]);
     boxIN->Pack(image_map["lamp"]);
     boxIN->Pack(image_map["resistor"]);
     boxIN->Pack(image_map["battery"]);
+    boxIN->Pack(image_map["bell"]);
     boxIN->Pack(image_map["ampermeter"]);
     boxIN->Pack(image_map["voltmeter"]);
 
@@ -118,9 +118,11 @@ int Hotwire::element_making(std::string name, sf::Vector2f pos, int amountOfBatt
 		temp = new Resistor;
 	} else if(name == "ampermeter"){
 		temp = new Ampermeter;
-	} else if(name =="voltmeter"){
+	} else if(name == "voltmeter"){
 		temp = new Voltmeter;
-	}else{
+	} else if(name == "bell"){
+		temp = new Bell;
+	} else{
 		return 0;		
 	}	
     temp->x = sf::Vector2f().x;

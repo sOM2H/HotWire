@@ -72,4 +72,15 @@ public:
 	std::string getType();
 };
 
+class Bell : public Element{
+public:
+	Bell(){}
+	~Bell();
+    float resistance = 0;
+    void draw();
+	void setImage();
+	std::string getType();
+};
+
+
 #endif

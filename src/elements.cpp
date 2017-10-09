@@ -37,6 +37,12 @@ void Voltmeter::setImage(){
 	image->SetImage(img);
 }
 
+void Bell::setImage(){
+	if(img.loadFromFile( "src/textures/bell.png" )){
+		printf("init new image bell\n");
+	}
+	image->SetImage(img);
+}
 
 
 void Lamp::draw(){
@@ -81,3 +87,12 @@ void Ampermeter::draw(){
 std::string Ampermeter::getType(){
 	return "ampermeter";
 }
+
+
+void Bell::draw(){
+}
+
+std::string Bell::getType(){
+	return "bell";
+}
+
