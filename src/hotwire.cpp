@@ -5,8 +5,8 @@
 #include <iostream>
 
 Hotwire::Hotwire()
-	: render_window(sf::VideoMode(800, 600), "HotWire", sf::Style::Titlebar | sf::Style::Close) 
-	/*: render_window(sf::VideoMode(0, 0), "HotWire", sf::Style::Fullscreen)*/ {
+	/*: render_window(sf::VideoMode(800, 600), "HotWire", sf::Style::Titlebar | sf::Style::Close)*/
+	: render_window(sf::VideoMode(0, 0), "HotWire", sf::Style::Fullscreen) {
 }
 
 
@@ -20,11 +20,10 @@ void Hotwire::init(){
     box->Pack(boxIN, false, false);
     box->SetSpacing( 5.f );
 
-	box->Add( fixed );
-
-   
-   // sfgui_window_bar->SetRequisition(sf::Vector2f(WS_BAR_W, WS_BAR_H));
+	sfgui_window_bar->SetRequisition(sf::Vector2f(0, SFGUI_WS_BAR_H));
+	sfgui_window_bar->SetAllocation(sf::FloatRect(0, 0, 60, SFGUI_WS_BAR_H));
     sfgui_window_bar->SetStyle(sfg::Window::Style::BACKGROUND);
+	sfgui_window_bar->SetPosition(sf::Vector2f(0.f, 0.f));
 
 
     bool & running_ref = running;
@@ -53,8 +52,10 @@ void Hotwire::init(){
 
 
     sfgui_window->GetSignal(sfg::Window::OnMouseLeftPress).Connect([&]{
-	    std::cout << "Click on window.\n";
-	    element_making(buffer_ref, sf::Vector2f(mouse.getPosition().x - WS_BAR_W - 40, mouse.getPosition().y - 40), amountOfBatteries, counter);
+		std::cout << "********************\n";
+	    std::cout << "^ Click on window. ^\n";
+		std::cout << "********************\n\n";
+	    element_making(buffer_ref, sf::Vector2f(mouse.getPosition(render_window).x - SFGUI_WS_BAR_W - 40, mouse.getPosition(render_window).y - 40), amountOfBatteries, counter);
 	});
 
     boxIN->Pack(image_map["lamp"]);
@@ -64,13 +65,30 @@ void Hotwire::init(){
     boxIN->Pack(image_map["ampermeter"]);
     boxIN->Pack(image_map["voltmeter"]);
 
-
+	sfgui_window->Add( fixed );
     sfgui_window_bar->Add( box ); 
+
     running = true;
 	
-    sfgui_window->SetRequisition(sf::Vector2f(WS_W , WS_H));
+    sfgui_window->SetRequisition(sf::Vector2f(SFGUI_WS_W, SFGUI_WS_H));
+
+	std::cout<< "WS_W: " << WS_W << "\n";
+	std::cout<< "WS_H: " << WS_H << "\n\n";
+	
+	std::cout<< "SFGUI_WS_BAR_W: " << SFGUI_WS_BAR_W << "\n";
+	std::cout<< "SFGUI_WS_BAR_H: " << SFGUI_WS_BAR_H << "\n\n";	
+
+	std::cout<< "render_window.getSize().x: " << render_window.getSize().x << "\n\n";
+
+	std::cout<< "sfgui_window_bar->GetAllocation().width: " << sfgui_window_bar->GetAllocation().width << "\n\n";
+
     sfgui_window->SetStyle(sfg::Window::Style::BACKGROUND);
-	sfgui_window->SetPosition(sf::Vector2f(sfgui_window_bar->GetAllocation().left + sfgui_window_bar->GetAllocation().width , 0));
+	sfgui_window->SetPosition(sf::Vector2f(SFGUI_WS_BAR_W, 0));
+
+	
+    
+	std::cout<< "Box GetAllocation().wight: " << box->GetAllocation().width << "\n";
+	std::cout<< "BoxIN GetAllocation().wight: " << boxIN->GetAllocation().width << "\n\n";
 }
 
 void Hotwire::handle_events(){
@@ -93,7 +111,6 @@ void Hotwire::render(){
 }
 
 void Hotwire::update(){
-
 }
 
 void Hotwire::clear(){
@@ -105,7 +122,8 @@ void Hotwire::init_image(const std::string & name){
     std::cout<< "src/textures/" + name + ".png" << std::endl;
     image_map[name] = sfg::Image::Create();
     image_map[name]->SetImage( texture_manager->sfml_image_map[name]);
-    image_map[name]->SetRequisition(sf::Vector2f(25.f, 25.f));
+	std::cout<< "Image getRequisition.x: " << image_map[name]->GetRequisition().x << "\n";
+	std::cout<< "Image getRequisition.y: " << image_map[name]->GetRequisition().y << "\n\n";
 }
 
 
@@ -117,32 +135,28 @@ int Hotwire::element_making(std::string name, sf::Vector2f pos, int amountOfBatt
 	}else if(name == "battery"){
 		amountOfBatteries++;
 		temp = new Battery;
-		//temp->image->GetSignal(sfg::Image::OnMouseRightPress).Connect([]{});
 	} else if(name == "resistor"){
 		temp = new Resistor;
-		//temp->image->GetSignal(sfg::Image::OnMouseRightPress).Connect([]{; std::cout << "buffer: lamp\n";});
 	} else if(name == "ampermeter"){
 		temp = new Ampermeter;
-		//temp->image->GetSignal(sfg::Image::OnMouseRightPress).Connect([]{; std::cout << "buffer: lamp\n";});
 	} else if(name == "voltmeter"){
 		temp = new Voltmeter;
-		//temp->image->GetSignal(sfg::Image::OnMouseRightPress).Connect([]{; std::cout << "buffer: lamp\n";});
 	} else if(name == "bell"){
 		temp = new Bell;
-		//temp->image->GetSignal(sfg::Image::OnMouseRightPress).Connect([]{; std::cout << "buffer: lamp\n";});
 	} else{
 		return 0;		
 	}
 	
 
-    temp->x = sf::Vector2f().x;
-    temp->y = sf::Vector2f().y;
+    temp->x = pos.x;
+    temp->y = pos.y;
     element_map[counter] = temp;
 
 	temp->setImage();
 
 	counter++;
-	
-	std::cout<< "Creating new element " << name << ".\n";
+	std::cout<< "//////// INFO ////////\n";	
+	std::cout<< "Creating new element: " << name <<".\n" << "	Position:\n" << "		x: " << pos.x << "\n" << "		y: " << pos.y << "\n";
+	std::cout<< "////// End INFO //////\n\n"; 
 	fixed->Put( temp->image, pos);
 }

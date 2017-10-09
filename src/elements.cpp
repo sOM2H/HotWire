@@ -3,21 +3,21 @@
 
 void Lamp::setImage(){
 	if(img.loadFromFile( "src/textures/lamp.png" )){
-		printf("init new image lamp\n");
+		printf("Init new image: lamp.png\n\n");
 	}
 	image->SetImage(img);
 }
 
 void Battery::setImage(){
 	if(img.loadFromFile( "src/textures/battery.png" )){
-		printf("init new image battery\n");
+		printf("Init new image: battery.png\n\n");
 	}
 	image->SetImage(img);
 }
 
 void Resistor::setImage(){
 	if(img.loadFromFile( "src/textures/resistor.png" )){
-		printf("init new image resistor\n");
+		printf("Init new image: resistor.png\n\n");
 	}
 	image->SetImage(img);
 }
@@ -25,21 +25,21 @@ void Resistor::setImage(){
 
 void Ampermeter::setImage(){
 	if(img.loadFromFile( "src/textures/ampermeter.png" )){
-		printf("init new image ampermeter\n");
+		printf("Init new image: ampermeter.png\n\n");
 	}
 	image->SetImage(img);
 }
 
 void Voltmeter::setImage(){
 	if(img.loadFromFile( "src/textures/voltmeter.png" )){
-		printf("init new image voltmeter\n");
+		printf("Init new image: voltmeter.png\n\n");
 	}
 	image->SetImage(img);
 }
 
 void Bell::setImage(){
 	if(img.loadFromFile( "src/textures/bell.png" )){
-		printf("init new image bell\n");
+		printf("Init new image: bell.png\n\n");
 	}
 	image->SetImage(img);
 }

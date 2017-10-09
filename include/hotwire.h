@@ -2,8 +2,11 @@
 #define TM_H
 #define WS_W render_window.getSize().x
 #define WS_H render_window.getSize().y
-#define WS_BAR_W (render_window.getSize().x)*0.06
-#define WS_BAR_H render_window.getSize().y
+#define SFGUI_WS_W (render_window.getSize().x - sfgui_window_bar->GetAllocation().width) 
+#define SFGUI_WS_H render_window.getSize().y 
+#define SFGUI_WS_BAR_W sfgui_window_bar->GetAllocation().width
+#define SFGUI_WS_BAR_H render_window.getSize().y
+
 //#include "texture_manager.h"
 #include "elements.h"
 #include <SFGUI/SFGUI.hpp>
