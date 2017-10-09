@@ -23,5 +23,8 @@ obj/texture_manager.o: src/texture_manager.cpp include/texture_manager.h
 obj/hotwire.o: src/hotwire.cpp include/hotwire.h obj/texture_manager.o
 	g++ -c $(flags) $< -Iinclude/ -o $@
 
+obj/elements.o: src/elements.cpp include/elements.h
+	g++ -c $(flags) $< -Iinclude/ -o $@
+
 clear:
 	-rm $(bin) $(objs)

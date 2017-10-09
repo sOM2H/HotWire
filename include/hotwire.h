@@ -4,10 +4,11 @@
 #define WS_H render_window.getSize().y
 #define WS_BAR_W (render_window.getSize().x)*0.06
 #define WS_BAR_H render_window.getSize().y
-#include "texture_manager.h"
+//#include "texture_manager.h"
+#include "elements.h"
 #include <SFGUI/SFGUI.hpp>
 #include <SFGUI/Widgets.hpp>
-
+#include <memory>
 
 class Hotwire{
     public: 
@@ -15,20 +16,31 @@ class Hotwire{
         ~Hotwire();
 
         sf::RenderWindow render_window;
-	sfg::Desktop desktop;
-	sfg::Canvas::Ptr canvas = sfg::Canvas::Create();
-	sfg::SFGUI sfgui;
+		sfg::SFGUI sfgui;
 
-	sfg::Window::Ptr sfgui_window = sfg::Window::Create();
-	sfg::Window::Ptr sfgui_window_menu = sfg::Window::Create();
-	sfg::Window::Ptr sfgui_window_pause = sfg::Window::Create();
-	sfg::Window::Ptr sfgui_window_bar = sfg::Window::Create();
+		sf::Mouse mouse;
 
-	std::map<std::string, sfg::Image::Ptr> image_map;
-	void init_image(const std::string & name);
-	
-	std::string buffer = "empty";
+		sfg::Window::Ptr sfgui_window = sfg::Window::Create();
+		sfg::Window::Ptr sfgui_window_menu = sfg::Window::Create();
+		sfg::Window::Ptr sfgui_window_pause = sfg::Window::Create();
+		sfg::Window::Ptr sfgui_window_bar = sfg::Window::Create();
+		
+		std::map<std::string, sfg::Image::Ptr> image_map;
+
+		//Element element;
+		sfg::Fixed::Ptr fixed = sfg::Fixed::Create();
+		void init_image(const std::string & name);
+
+		std::map<int , Element* > element_map;	
+		
+		std::string buffer = "empty";
         bool running = false;
+
+		int amountOfBatteries = 0;
+		int counter = 0;
+
+		int  element_making(std::string name, sf::Vector2f, int amountOfBatteries, int counter);
+
         void init();
         void handle_events();
         void render();
