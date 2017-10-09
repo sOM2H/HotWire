@@ -5,7 +5,8 @@
 #include <iostream>
 
 Hotwire::Hotwire()
-	: render_window(sf::VideoMode(0, 0), "HotWire", sf::Style::Fullscreen) {
+	: render_window(sf::VideoMode(800, 600), "HotWire", sf::Style::Titlebar | sf::Style::Close) 
+	/*: render_window(sf::VideoMode(0, 0), "HotWire", sf::Style::Fullscreen)*/ {
 }
 
 
@@ -19,14 +20,12 @@ void Hotwire::init(){
     box->Pack(boxIN, false, false);
     box->SetSpacing( 5.f );
 
-	sfgui_window->Add( fixed );
+	box->Add( fixed );
 
-    sfgui_window->SetRequisition(sf::Vector2f(WS_W, WS_H));
-    sfgui_window->SetStyle(sfg::Window::Style::BACKGROUND);
-	sfgui_window->SetPosition(sf::Vector2f(WS_BAR_W, 0));
    
-    sfgui_window_bar->SetRequisition(sf::Vector2f(WS_BAR_W, WS_BAR_H));
+   // sfgui_window_bar->SetRequisition(sf::Vector2f(WS_BAR_W, WS_BAR_H));
     sfgui_window_bar->SetStyle(sfg::Window::Style::BACKGROUND);
+
 
     bool & running_ref = running;
     std::string & buffer_ref = buffer;
@@ -68,6 +67,10 @@ void Hotwire::init(){
 
     sfgui_window_bar->Add( box ); 
     running = true;
+	
+    sfgui_window->SetRequisition(sf::Vector2f(WS_W , WS_H));
+    sfgui_window->SetStyle(sfg::Window::Style::BACKGROUND);
+	sfgui_window->SetPosition(sf::Vector2f(sfgui_window_bar->GetAllocation().left + sfgui_window_bar->GetAllocation().width , 0));
 }
 
 void Hotwire::handle_events(){
