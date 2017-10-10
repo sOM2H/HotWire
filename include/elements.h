@@ -7,8 +7,8 @@
 
 class Element{
 public:
-    float x;
-    float y;
+    int  x;
+    int  y;
 	virtual void draw() = 0;
 	virtual std::string getType() = 0;
 	sf::Image  img;

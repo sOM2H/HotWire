@@ -39,10 +39,15 @@ class Hotwire{
 		std::string buffer = "empty";
         bool running = false;
 
+		int amountImageX;
+		int amountImagey;
+
+		sf::Vector2i couting_amountImage(int ws_w, int ws_h, int img_s);
+
 		int amountOfBatteries = 0;
 		int counter = 0;
 
-		int  element_making(std::string name, sf::Vector2f, int amountOfBatteries, int counter);
+		int  element_making(std::string name, sf::Vector2i pos, int amountOfBatteries, int counter);
 
         void init();
         void handle_events();
