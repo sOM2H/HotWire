@@ -55,7 +55,7 @@ void Hotwire::init(){
 		std::cout << "********************\n";
 	    std::cout << "^ Click on window. ^\n";
 		std::cout << "********************\n\n";
-	    element_making(buffer_ref, sf::Vector2f(mouse.getPosition(render_window).x - SFGUI_WS_BAR_W - 40, mouse.getPosition(render_window).y - 40), amountOfBatteries, counter);
+	    element_making(buffer_ref, sf::Vector2f(mouse.getPosition(render_window).x, mouse.getPosition(render_window).y), amountOfBatteries, counter);
 	});
 
     boxIN->Pack(image_map["lamp"]);
@@ -148,7 +148,7 @@ int Hotwire::element_making(std::string name, sf::Vector2f pos, int amountOfBatt
 	}
 	
 
-    temp->x = pos.x;
+    temp->x = pos.x - SFGUI_WS_BAR_W;
     temp->y = pos.y;
     element_map[counter] = temp;
 
@@ -156,7 +156,7 @@ int Hotwire::element_making(std::string name, sf::Vector2f pos, int amountOfBatt
 
 	counter++;
 	std::cout<< "//////// INFO ////////\n";	
-	std::cout<< "Creating new element: " << name <<".\n" << "	Position:\n" << "		x: " << pos.x << "\n" << "		y: " << pos.y << "\n";
+	std::cout<< "Creating new element: " << name <<".\n" << "	Position:\n" << "		x: " << temp->x << "\n" << "		y: " << temp->y << "\n";
 	std::cout<< "////// End INFO //////\n\n"; 
-	fixed->Put( temp->image, pos);
+	fixed->Put( temp->image, sf::Vector2f(temp->x - 40 , temp->y - 40 ));
 }
