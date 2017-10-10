@@ -5,8 +5,8 @@
 #include <iostream>
 
 Hotwire::Hotwire()
-	/*: render_window(sf::VideoMode(800, 600), "HotWire", sf::Style::Titlebar | sf::Style::Close)*/
-	: render_window(sf::VideoMode(0, 0), "HotWire", sf::Style::Fullscreen) {
+	: render_window(sf::VideoMode(800, 600), "HotWire", sf::Style::Titlebar | sf::Style::Close)
+	/*: render_window(sf::VideoMode(0, 0), "HotWire", sf::Style::Fullscreen)*/ {
 }
 
 
@@ -55,7 +55,7 @@ void Hotwire::init(){
 		std::cout << "********************\n";
 	    std::cout << "^ Click on window. ^\n";
 		std::cout << "********************\n\n";
-	    element_making(buffer_ref, sf::Vector2f(mouse.getPosition(render_window).x, mouse.getPosition(render_window).y), amountOfBatteries, counter);
+	    element_making(buffer_ref, sf::Vector2i(mouse.getPosition(render_window).x, mouse.getPosition(render_window).y), amountOfBatteries, counter);
 	});
 
     boxIN->Pack(image_map["lamp"]);
@@ -89,6 +89,7 @@ void Hotwire::init(){
     
 	std::cout<< "Box GetAllocation().wight: " << box->GetAllocation().width << "\n";
 	std::cout<< "BoxIN GetAllocation().wight: " << boxIN->GetAllocation().width << "\n\n";
+
 }
 
 void Hotwire::handle_events(){
@@ -128,8 +129,9 @@ void Hotwire::init_image(const std::string & name){
 
 
 
-int Hotwire::element_making(std::string name, sf::Vector2f pos, int amountOfBatteries, int counter){
+int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatteries, int counter){
 	Element * temp;
+
 	if(name == "lamp"){		
 		temp = new Lamp;
 	}else if(name == "battery"){
@@ -148,8 +150,8 @@ int Hotwire::element_making(std::string name, sf::Vector2f pos, int amountOfBatt
 	}
 	
 
-    temp->x = pos.x - SFGUI_WS_BAR_W;
-    temp->y = pos.y;
+    temp->x = ((int(pos.x - SFGUI_WS_BAR_W)/60))*60;
+    temp->y = ((pos.y/60))*60;
     element_map[counter] = temp;
 
 	temp->setImage();
@@ -157,6 +159,13 @@ int Hotwire::element_making(std::string name, sf::Vector2f pos, int amountOfBatt
 	counter++;
 	std::cout<< "//////// INFO ////////\n";	
 	std::cout<< "Creating new element: " << name <<".\n" << "	Position:\n" << "		x: " << temp->x << "\n" << "		y: " << temp->y << "\n";
-	std::cout<< "////// End INFO //////\n\n"; 
-	fixed->Put( temp->image, sf::Vector2f(temp->x - 40 , temp->y - 40 ));
+	std::cout<< "////// End INFO //////\n\n";
+	
+	fixed->Put( temp->image, sf::Vector2f(temp->x, temp->y));
+}
+
+sf::Vector2i Hotwire::couting_amountImage(int ws_w, int ws_h, int img_s){
+	int w = ws_w/img_s;
+	int h = ws_h/img_s;
+	return sf::Vector2i(w, h);
 }
