@@ -18,7 +18,7 @@ void Hotwire::init(){
     auto box = sfg::Box::Create();
 
     box->Pack(boxIN, false, false);
-    box->SetSpacing( 5.f );
+    //box->SetSpacing( 5.f );
 
 	sfgui_window_bar->SetRequisition(sf::Vector2f(0, SFGUI_WS_BAR_H));
 	sfgui_window_bar->SetAllocation(sf::FloatRect(0, 0, 60, SFGUI_WS_BAR_H));
@@ -64,13 +64,14 @@ void Hotwire::init(){
     boxIN->Pack(image_map["bell"]);
     boxIN->Pack(image_map["ampermeter"]);
     boxIN->Pack(image_map["voltmeter"]);
-
+	
 	sfgui_window->Add( fixed );
     sfgui_window_bar->Add( box ); 
+	fixed->SetPosition(sf::Vector2f(0, 0));
 
     running = true;
 	
-    sfgui_window->SetRequisition(sf::Vector2f(SFGUI_WS_W, SFGUI_WS_H));
+    sfgui_window->SetRequisition(sf::Vector2f(SFGUI_WS_W + 22, SFGUI_WS_H + 22));
 
 	std::cout<< "WS_W: " << WS_W << "\n";
 	std::cout<< "WS_H: " << WS_H << "\n\n";
@@ -83,7 +84,7 @@ void Hotwire::init(){
 	std::cout<< "sfgui_window_bar->GetAllocation().width: " << sfgui_window_bar->GetAllocation().width << "\n\n";
 
     sfgui_window->SetStyle(sfg::Window::Style::BACKGROUND);
-	sfgui_window->SetPosition(sf::Vector2f(SFGUI_WS_BAR_W, 0));
+	sfgui_window->SetPosition(sf::Vector2f(SFGUI_WS_BAR_W - 11, -11));
 
 	
     
@@ -127,7 +128,13 @@ void Hotwire::init_image(const std::string & name){
 	std::cout<< "Image getRequisition.y: " << image_map[name]->GetRequisition().y << "\n\n";
 }
 
+std::ostream & operator<<(std::ostream & os, sf::Vector2f vec) {
+	os << "(" << vec.x << ", " << vec.y << ")";
+}
 
+std::ostream & operator<<(std::ostream & os, sf::FloatRect vec) {
+	os << "(" << vec.left << ", " << vec.top << ", " << vec.width << "x" << vec.height << ")";
+}
 
 int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatteries, int counter){
 	Element * temp;
@@ -162,6 +169,7 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 	std::cout<< "////// End INFO //////\n\n";
 	
 	fixed->Put( temp->image, sf::Vector2f(temp->x, temp->y));
+	std::cout<< fixed->GetAllocation() << "\n\n";
 }
 
 sf::Vector2i Hotwire::couting_amountImage(int ws_w, int ws_h, int img_s){
