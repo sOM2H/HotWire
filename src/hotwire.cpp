@@ -98,9 +98,9 @@ void Hotwire::handle_events(){
         if (event.type == sf::Event::Closed || event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape){
             running = false;
 		}
+		sfgui_window->HandleEvent( event );	
+		sfgui_window_bar->HandleEvent( event );	
 	}
-    sfgui_window->HandleEvent( event );	
-    sfgui_window_bar->HandleEvent( event );	
 }
 
 void Hotwire::render(){
