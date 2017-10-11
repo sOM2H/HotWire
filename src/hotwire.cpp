@@ -21,8 +21,8 @@ void Hotwire::init(){
     //box->SetSpacing( 5.f );
 
 	sfgui_window_bar->SetRequisition(sf::Vector2f(0, SFGUI_WS_BAR_H));
-	sfgui_window_bar->SetAllocation(sf::FloatRect(0, 0, 60, SFGUI_WS_BAR_H));
-    sfgui_window_bar->SetStyle(sfg::Window::Style::BACKGROUND);
+	sfgui_window_bar->SetAllocation(sf::FloatRect(0, 0, 60,SFGUI_WS_BAR_H));
+	sfgui_window_bar->SetStyle(sfg::Window::Style::BACKGROUND);
 	sfgui_window_bar->SetPosition(sf::Vector2f(0.f, 0.f));
 
 
@@ -49,13 +49,11 @@ void Hotwire::init(){
     image_map["voltmeter"]->GetSignal(sfg::Image::OnMouseLeftPress).Connect([&buffer_ref]{buffer_ref = "voltmeter"; std::cout << "buffer: voltmeter\n";});
     image_map["bell"]->GetSignal(sfg::Image::OnMouseLeftPress).Connect([&buffer_ref]{buffer_ref = "bell"; std::cout << "buffer: bell\n";});
 
-
-
     sfgui_window->GetSignal(sfg::Window::OnMouseLeftPress).Connect([&]{
 		std::cout << "********************\n";
 	    std::cout << "^ Click on window. ^\n";
 		std::cout << "********************\n\n";
-	    element_making(buffer_ref, sf::Vector2i(mouse.getPosition(render_window).x, mouse.getPosition(render_window).y), amountOfBatteries, counter);
+	    element_making(buffer_ref, sf::Vector2i(mouse.getPosition(render_window).x, mouse.getPosition(render_window).y), amountOfBatteries, id);
 	});
 
     boxIN->Pack(image_map["lamp"]);
@@ -136,7 +134,7 @@ std::ostream & operator<<(std::ostream & os, sf::FloatRect vec) {
 	os << "(" << vec.left << ", " << vec.top << ", " << vec.width << "x" << vec.height << ")";
 }
 
-int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatteries, int counter){
+int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatteries, int &id){
 	Element * temp;
 
 	if(name == "lamp"){		
@@ -159,13 +157,37 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 
     temp->x = ((int(pos.x - SFGUI_WS_BAR_W)/60))*60;
     temp->y = ((pos.y/60))*60;
-    element_map[counter] = temp;
+	temp->id = id;
+    element_map[id] = temp;
 
 	temp->setImage();
 
-	counter++;
+	
+	int & bufferFirstElement_ref = 	bufferFirstElement;
+	int & bufferSecondElement_ref = bufferSecondElement;
+	
+    temp->image->GetSignal(sfg::Image::OnMouseRightPress).Connect([&, tempid = temp->id]{
+			if(bufferFirstElement_ref == -1){
+				bufferFirstElement_ref = tempid;
+			}else{
+				bufferSecondElement_ref = tempid;
+			}
+			if(bufferFirstElement_ref != -1 && bufferSecondElement_ref != -1){
+				wires.push_back(std::make_pair(bufferFirstElement_ref, bufferSecondElement_ref));
+				wires.push_back(std::make_pair(bufferSecondElement_ref, bufferFirstElement_ref));
+				std::cout<< "New wire: "<< bufferFirstElement_ref << ", " << bufferSecondElement_ref << "\n\n";
+				std::cout<< "temp id: " << tempid << "\n\n";
+				std::cout<< "id: " << id <<"\n\n";
+				bufferFirstElement = -1;
+				bufferSecondElement = -1;
+			}
+	});
+
+	
+
+	id++;
 	std::cout<< "//////// INFO ////////\n";	
-	std::cout<< "Creating new element: " << name <<".\n" << "	Position:\n" << "		x: " << temp->x << "\n" << "		y: " << temp->y << "\n";
+	std::cout<< "Creating new element: " << name <<".\n" << "	id: "<< temp->id << "	Position:\n" << "		x: " << temp->x << "\n" << "		y: " << temp->y << "\n";
 	std::cout<< "////// End INFO //////\n\n";
 	
 	buffer = "empty";
