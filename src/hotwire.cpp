@@ -168,8 +168,10 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 	std::cout<< "Creating new element: " << name <<".\n" << "	Position:\n" << "		x: " << temp->x << "\n" << "		y: " << temp->y << "\n";
 	std::cout<< "////// End INFO //////\n\n";
 	
+	buffer = "empty";
+	std::cout<< "buffer: "<< buffer << "\n\n";
 	fixed->Put( temp->image, sf::Vector2f(temp->x, temp->y));
-	std::cout<< fixed->GetAllocation() << "\n\n";
+	//std::cout<< fixed->GetAllocation() << "\n\n";
 }
 
 sf::Vector2i Hotwire::couting_amountImage(int ws_w, int ws_h, int img_s){
