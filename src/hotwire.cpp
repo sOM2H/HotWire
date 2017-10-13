@@ -53,7 +53,7 @@ void Hotwire::init(){
 		std::cout << "********************\n";
 	    std::cout << "^ Click on window. ^\n";
 		std::cout << "********************\n\n";
-	    element_making(buffer_ref, sf::Vector2i(mouse.getPosition(render_window).x, mouse.getPosition(render_window).y), amountOfBatteries, id);
+	    element_making(buffer_ref, sf::Vector2i(mouse.getPosition(render_window).x, mouse.getPosition(render_window).y), amountOfBatteries, element_id);
 	});
 
     boxIN->Pack(image_map["lamp"]);
@@ -63,8 +63,10 @@ void Hotwire::init(){
     boxIN->Pack(image_map["ampermeter"]);
     boxIN->Pack(image_map["voltmeter"]);
 	
-	sfgui_window->Add( fixed );
-    sfgui_window_bar->Add( box ); 
+	sfgui_window->Add( fixed );	
+    canvas->SetRequisition(sf::Vector2f(SFGUI_WS_W, SFGUI_WS_H));
+	sfgui_window->Add( canvas );
+    sfgui_window_bar->Add( box );	
 	fixed->SetPosition(sf::Vector2f(0, 0));
 
     running = true;
@@ -101,12 +103,17 @@ void Hotwire::handle_events(){
 		sfgui_window_bar->HandleEvent( event );	
 	}
 }
-
 void Hotwire::render(){
     sfgui_window->Update(0.f);
     sfgui_window_bar->Update(0.f);
+	canvas->Bind();
     render_window.clear();
     sfgui.Display( render_window );
+	for(int i = 0; i < vector_draw_wire.size(); ++i){
+		canvas->Draw(*vector_draw_wire[i]);
+	}
+	canvas->Display();
+	canvas->Unbind();
     render_window.display();
 }
 
@@ -157,7 +164,7 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 
     temp->x = ((int(pos.x - SFGUI_WS_BAR_W)/60))*60;
     temp->y = ((pos.y/60))*60;
-	temp->id = id;
+	temp->id = element_id;
     element_map[id] = temp;
 
 	temp->setImage();
@@ -166,18 +173,31 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 	int & bufferFirstElement_ref = 	bufferFirstElement;
 	int & bufferSecondElement_ref = bufferSecondElement;
 	
-    temp->image->GetSignal(sfg::Image::OnMouseRightPress).Connect([&, tempid = temp->id]{
+    temp->image->GetSignal(sfg::Image::OnMouseRightPress).Connect([&, tempid = temp->id, this]{
 			if(bufferFirstElement_ref == -1){
 				bufferFirstElement_ref = tempid;
 			}else{
 				bufferSecondElement_ref = tempid;
 			}
 			if(bufferFirstElement_ref != -1 && bufferSecondElement_ref != -1){
-				wires.push_back(std::make_pair(bufferFirstElement_ref, bufferSecondElement_ref));
-				wires.push_back(std::make_pair(bufferSecondElement_ref, bufferFirstElement_ref));
+				Wire * temp_wire = new Wire;
+				std::cout<< "New wire\n";
+				vector_wires.push_back(std::make_pair(bufferFirstElement_ref, bufferSecondElement_ref));
+				vector_wires.push_back(std::make_pair(bufferSecondElement_ref, bufferFirstElement_ref));
+
+				temp_wire->wire.append(sf::Vertex(sf::Vector2f( ((int(element_map[bufferFirstElement_ref]->x - SFGUI_WS_BAR_W)/60))*60 - 30, 
+								((element_map[bufferFirstElement_ref]->y /60))*60 - 40 ),
+						   		sf::Color::White));
+
+				temp_wire->wire.append(sf::Vertex(sf::Vector2f( ((int(element_map[bufferSecondElement_ref]->x - SFGUI_WS_BAR_W)/60))*60 - 30,
+							   	((element_map[bufferSecondElement_ref]->y/60))*60 - 40 ),
+						   		sf::Color::White));
+				
+				vector_draw_wire.push_back( &temp_wire->wire);
+
 				std::cout<< "New wire: "<< bufferFirstElement_ref << ", " << bufferSecondElement_ref << "\n\n";
-				std::cout<< "temp id: " << tempid << "\n\n";
-				std::cout<< "id: " << id <<"\n\n";
+				std::cout<< "Amount id: " << id <<"\n\n";
+
 				bufferFirstElement = -1;
 				bufferSecondElement = -1;
 			}
@@ -187,7 +207,7 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 
 	id++;
 	std::cout<< "//////// INFO ////////\n";	
-	std::cout<< "Creating new element: " << name <<".\n" << "	id: "<< temp->id << "	Position:\n" << "		x: " << temp->x << "\n" << "		y: " << temp->y << "\n";
+	std::cout<< "Creating new element: " << name <<".\n" << "	id: "<< temp->id << "\n" << "	Position:\n" << "		x: " << temp->x << "\n" << "		y: " << temp->y << "\n";
 	std::cout<< "////// End INFO //////\n\n";
 	
 	buffer = "empty";

@@ -9,11 +9,19 @@ class Element{
 public:
     int  x;
     int  y;
+	int id;
 	virtual void draw() = 0;
 	virtual std::string getType() = 0;
-	sf::Image  img;
+	sf::Image img;
 	sfg::Image::Ptr image = sfg::Image::Create();
 	virtual void setImage() = 0;
+};
+
+class Wire{
+public:
+	Wire(){}
+	~Wire();
+	sf::VertexArray wire;
 };
 
 class Lamp : public Element{
