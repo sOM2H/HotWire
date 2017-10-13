@@ -5,7 +5,7 @@
 #include <iostream>
 
 Hotwire::Hotwire()
-	: render_window(sf::VideoMode(800, 600), "HotWire", sf::Style::Titlebar | sf::Style::Close)
+	: render_window(sf::VideoMode(800, 600), "HotWire", 5)
 	/*: render_window(sf::VideoMode(0, 0), "HotWire", sf::Style::Fullscreen)*/ {
 }
 
@@ -62,12 +62,13 @@ void Hotwire::init(){
     boxIN->Pack(image_map["bell"]);
     boxIN->Pack(image_map["ampermeter"]);
     boxIN->Pack(image_map["voltmeter"]);
-	
-	sfgui_window->Add( fixed );	
+		
     canvas->SetRequisition(sf::Vector2f(SFGUI_WS_W, SFGUI_WS_H));
-	sfgui_window->Add( canvas );
+	auto boxx = sfg::Box::Create();
+	fixed->Put(canvas, sf::Vector2f(30, 25));
+	sfgui_window->Add(fixed);
     sfgui_window_bar->Add( box );	
-	fixed->SetPosition(sf::Vector2f(0, 0));
+ 	
 
     running = true;
 	
@@ -104,16 +105,17 @@ void Hotwire::handle_events(){
 	}
 }
 void Hotwire::render(){
+
     sfgui_window->Update(0.f);
     sfgui_window_bar->Update(0.f);
-	canvas->Bind();
     render_window.clear();
-    sfgui.Display( render_window );
+	canvas->Bind();
 	for(int i = 0; i < vector_draw_wire.size(); ++i){
 		canvas->Draw(*vector_draw_wire[i]);
 	}
 	canvas->Display();
 	canvas->Unbind();
+    sfgui.Display( render_window );
     render_window.display();
 }
 
@@ -180,26 +182,7 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 				bufferSecondElement_ref = tempid;
 			}
 			if(bufferFirstElement_ref != -1 && bufferSecondElement_ref != -1){
-				Wire * temp_wire = new Wire;
-				std::cout<< "New wire\n";
-				vector_wires.push_back(std::make_pair(bufferFirstElement_ref, bufferSecondElement_ref));
-				vector_wires.push_back(std::make_pair(bufferSecondElement_ref, bufferFirstElement_ref));
-
-				temp_wire->wire.append(sf::Vertex(sf::Vector2f( ((int(element_map[bufferFirstElement_ref]->x - SFGUI_WS_BAR_W)/60))*60 - 30, 
-								((element_map[bufferFirstElement_ref]->y /60))*60 - 40 ),
-						   		sf::Color::White));
-
-				temp_wire->wire.append(sf::Vertex(sf::Vector2f( ((int(element_map[bufferSecondElement_ref]->x - SFGUI_WS_BAR_W)/60))*60 - 30,
-							   	((element_map[bufferSecondElement_ref]->y/60))*60 - 40 ),
-						   		sf::Color::White));
-				
-				vector_draw_wire.push_back( &temp_wire->wire);
-
-				std::cout<< "New wire: "<< bufferFirstElement_ref << ", " << bufferSecondElement_ref << "\n\n";
-				std::cout<< "Amount id: " << id <<"\n\n";
-
-				bufferFirstElement = -1;
-				bufferSecondElement = -1;
+				wire_making(bufferFirstElement_ref, bufferSecondElement_ref);
 			}
 	});
 
@@ -215,6 +198,29 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 	fixed->Put( temp->image, sf::Vector2f(temp->x, temp->y));
 	//std::cout<< fixed->GetAllocation() << "\n\n";
 }
+
+int Hotwire::wire_making(int b1, int b2){
+
+	Wire * temp_wire = new Wire;
+	std::cout<< "New wire\n";
+
+	vector_wires.push_back(std::make_pair(b1, b2));
+	vector_wires.push_back(std::make_pair(b2, b1));
+
+	temp_wire->wire.append(sf::Vertex(sf::Vector2f( element_map[b1]->x, element_map[b1]->y), sf::Color::Red));
+
+	temp_wire->wire.append(sf::Vertex(sf::Vector2f( element_map[b2]->x, element_map[b2]->y), sf::Color::Green));
+
+	temp_wire->wire.setPrimitiveType ( sf::LinesStrip ) ;
+	vector_draw_wire.push_back(&temp_wire->wire);
+
+	std::cout<< "New wire: "<< b1 << ", " << b2 << "\n\n";
+	std::cout<< "Amount id: " << element_id <<"\n\n";
+
+	bufferFirstElement = -1;
+	bufferSecondElement = -1;
+}
+
 
 sf::Vector2i Hotwire::couting_amountImage(int ws_w, int ws_h, int img_s){
 	int w = ws_w/img_s;
