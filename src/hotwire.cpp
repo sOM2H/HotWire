@@ -6,7 +6,7 @@
 
 Hotwire::Hotwire()
 	: render_window(sf::VideoMode(800, 600), "HotWire", 5)
-	/*: render_window(sf::VideoMode(0, 0), "HotWire", sf::Style::Fullscreen)*/ {
+	/*: render_window(sf::VideoMode(0, 0), "HotWire", sf::Style::Fullscreen) */{
 }
 
 
@@ -38,7 +38,7 @@ void Hotwire::init(){
     };
 
     for (const std::string & name : images) {
-	init_image(name);
+		init_image(name);
     }
 
 
@@ -56,6 +56,14 @@ void Hotwire::init(){
 	    element_making(buffer_ref, sf::Vector2i(mouse.getPosition(render_window).x, mouse.getPosition(render_window).y), amountOfBatteries, element_id);
 	});
 
+	sfgui_window->GetSignal(sfg::Window::OnMouseRightPress).Connect([&]{
+			render_bar = true;
+			sfgui_window_bar->SetPosition(sf::Vector2f(mouse.getPosition(render_window).x, mouse.getPosition(render_window).y));
+			if(render_bar){
+		   		//desktop.BringToFront(sfgui_window_bar);
+			}
+	});
+
     boxIN->Pack(image_map["lamp"]);
     boxIN->Pack(image_map["resistor"]);
     boxIN->Pack(image_map["battery"]);
@@ -65,10 +73,17 @@ void Hotwire::init(){
 		
     canvas->SetRequisition(sf::Vector2f(SFGUI_WS_W, SFGUI_WS_H));
 	auto boxx = sfg::Box::Create();
-	fixed->Put(canvas, sf::Vector2f(30, 25));
+	fixed->Put(canvas, sf::Vector2f(0, 0));
+	//fixed->Put(canvas, sf::Vector2f(30, 25));
 	sfgui_window->Add(fixed);
-    sfgui_window_bar->Add( box );	
+	//scroll_bar->SetPosition();
+	//scroll_bar->SetRequisition(sf::Vector2f(SFGUI_WS_BAR_W, SFGUI_WS_BAR_H));
+
+   	sfgui_window_bar->Add( box);
  	
+	desktop.Add( sfgui_window );
+	desktop.Add( sfgui_window_bar );
+	desktop.BringToFront( sfgui_window);
 
     running = true;
 	
@@ -85,7 +100,7 @@ void Hotwire::init(){
 	std::cout<< "sfgui_window_bar->GetAllocation().width: " << sfgui_window_bar->GetAllocation().width << "\n\n";
 
     sfgui_window->SetStyle(sfg::Window::Style::BACKGROUND);
-	sfgui_window->SetPosition(sf::Vector2f(SFGUI_WS_BAR_W - 11, -11));
+	sfgui_window->SetPosition(sf::Vector2f(-11, -11));
 
 	
     
@@ -106,12 +121,16 @@ void Hotwire::handle_events(){
 }
 void Hotwire::render(){
 
-    sfgui_window->Update(0.f);
-    sfgui_window_bar->Update(0.f);
+    //sfgui_window->Update(0.f);
+    //sfgui_window_bar->Update(0.f);
+	desktop.Update(0.f);
     render_window.clear();
 	canvas->Bind();
 	for(int i = 0; i < vector_draw_wire.size(); ++i){
 		canvas->Draw(*vector_draw_wire[i]);
+	}
+	for(int i = 0; i < vector_draw_circleshape.size(); ++i){
+		canvas->Draw(*vector_draw_circleshape[i]);
 	}
 	canvas->Display();
 	canvas->Unbind();
@@ -159,23 +178,30 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 		temp = new Voltmeter;
 	} else if(name == "bell"){
 		temp = new Bell;
+
 	} else{
 		return 0;		
 	}
 	
 
-    temp->x = ((int(pos.x - SFGUI_WS_BAR_W)/60))*60;
+    temp->x = ((pos.x/60))*60;
     temp->y = ((pos.y/60))*60;
 	temp->id = element_id;
     element_map[id] = temp;
 
 	temp->setImage();
-
 	
+	temp->first_ending.setPosition(sf::Vector2f(temp->x - 5, temp->y + 25));
+	temp->second_ending.setPosition(sf::Vector2f(temp->x + 60 - 5, temp->y + 25));
+
+	vector_draw_circleshape.push_back(&temp->first_ending);
+	vector_draw_circleshape.push_back(&temp->second_ending);
+
 	int & bufferFirstElement_ref = 	bufferFirstElement;
 	int & bufferSecondElement_ref = bufferSecondElement;
 	
     temp->image->GetSignal(sfg::Image::OnMouseRightPress).Connect([&, tempid = temp->id, this]{
+			render_bar = false;
 			if(bufferFirstElement_ref == -1){
 				bufferFirstElement_ref = tempid;
 			}else{
@@ -193,9 +219,12 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 	std::cout<< "Creating new element: " << name <<".\n" << "	id: "<< temp->id << "\n" << "	Position:\n" << "		x: " << temp->x << "\n" << "		y: " << temp->y << "\n";
 	std::cout<< "////// End INFO //////\n\n";
 	
-	buffer = "empty";
+	buffer = "lamp";
 	std::cout<< "buffer: "<< buffer << "\n\n";
+	sfg::Widget::Ptr canvas = fixed->GetChildren().back();
+	fixed->Remove(canvas);
 	fixed->Put( temp->image, sf::Vector2f(temp->x, temp->y));
+	fixed->Put( canvas, sf::Vector2f(0, 0));
 	//std::cout<< fixed->GetAllocation() << "\n\n";
 }
 
@@ -207,9 +236,50 @@ int Hotwire::wire_making(int b1, int b2){
 	vector_wires.push_back(std::make_pair(b1, b2));
 	vector_wires.push_back(std::make_pair(b2, b1));
 
-	temp_wire->wire.append(sf::Vertex(sf::Vector2f( element_map[b1]->x, element_map[b1]->y), sf::Color::Red));
+	if(element_map[b1]->x > element_map[b2]->x){
 
-	temp_wire->wire.append(sf::Vertex(sf::Vector2f( element_map[b2]->x, element_map[b2]->y), sf::Color::Green));
+		if(element_map[b1]->y > element_map[b2]->y){
+
+			temp_wire->wire.append(sf::Vertex(sf::Vector2f( element_map[b1]->first_ending.getPosition().x + 5, element_map[b1]->first_ending.getPosition().y + 5), sf::Color::Red));
+			temp_wire->wire.append(sf::Vertex(sf::Vector2f( element_map[b1]->first_ending.getPosition().x + 5, element_map[b2]->second_ending.getPosition().y + 5), sf::Color::Yellow));
+			temp_wire->wire.append(sf::Vertex(sf::Vector2f( element_map[b2]->second_ending.getPosition().x + 5, element_map[b2]->second_ending.getPosition().y + 5), sf::Color::Green));
+
+		}else if(element_map[b1]->y == element_map[b2]->y){			
+
+			temp_wire->wire.append(sf::Vertex(sf::Vector2f( element_map[b1]->first_ending.getPosition().x + 5, element_map[b1]->first_ending.getPosition().y + 5), sf::Color::Red));
+			temp_wire->wire.append(sf::Vertex(sf::Vector2f( element_map[b2]->second_ending.getPosition().x + 5, element_map[b2]->second_ending.getPosition().y + 5), sf::Color::Green));
+
+		}else{
+
+			temp_wire->wire.append(sf::Vertex(sf::Vector2f( element_map[b1]->first_ending.getPosition().x + 5, element_map[b1]->first_ending.getPosition().y + 5), sf::Color::Red));
+			temp_wire->wire.append(sf::Vertex(sf::Vector2f( element_map[b2]->second_ending.getPosition().x + 5, element_map[b1]->first_ending.getPosition().y + 5), sf::Color::Yellow));
+			temp_wire->wire.append(sf::Vertex(sf::Vector2f( element_map[b2]->second_ending.getPosition().x + 5, element_map[b2]->second_ending.getPosition().y + 5), sf::Color::Green));
+		}
+	}else if(element_map[b1]->x == element_map[b2]->x){
+
+			temp_wire->wire.append(sf::Vertex(sf::Vector2f( element_map[b1]->first_ending.getPosition().x + 5, element_map[b1]->first_ending.getPosition().y + 5), sf::Color::Red));
+			temp_wire->wire.append(sf::Vertex(sf::Vector2f( element_map[b2]->first_ending.getPosition().x + 5, element_map[b2]->first_ending.getPosition().y + 5), sf::Color::Green));
+
+	}else{
+		if(element_map[b1]->y > element_map[b2]->y){
+
+			temp_wire->wire.append(sf::Vertex(sf::Vector2f( element_map[b1]->second_ending.getPosition().x + 5, element_map[b1]->second_ending.getPosition().y + 5), sf::Color::Red));
+			temp_wire->wire.append(sf::Vertex(sf::Vector2f( element_map[b2]->first_ending.getPosition().x + 5, element_map[b1]->second_ending.getPosition().y + 5), sf::Color::Yellow));
+			temp_wire->wire.append(sf::Vertex(sf::Vector2f( element_map[b2]->first_ending.getPosition().x + 5, element_map[b2]->first_ending.getPosition().y + 5), sf::Color::Green));
+
+		}else if(element_map[b1]->y == element_map[b2]->y){
+
+			temp_wire->wire.append(sf::Vertex(sf::Vector2f( element_map[b1]->first_ending.getPosition().x + 5, element_map[b1]->first_ending.getPosition().y + 5), sf::Color::Red));
+			temp_wire->wire.append(sf::Vertex(sf::Vector2f( element_map[b2]->first_ending.getPosition().x + 5, element_map[b2]->first_ending.getPosition().y + 5), sf::Color::Green));
+			
+		}else{
+
+			temp_wire->wire.append(sf::Vertex(sf::Vector2f( element_map[b1]->second_ending.getPosition().x + 5, element_map[b1]->second_ending.getPosition().y + 5), sf::Color::Red));
+			temp_wire->wire.append(sf::Vertex(sf::Vector2f( element_map[b1]->second_ending.getPosition().x + 5, element_map[b2]->first_ending.getPosition().y + 5), sf::Color::Yellow));
+			temp_wire->wire.append(sf::Vertex(sf::Vector2f( element_map[b2]->first_ending.getPosition().x + 5, element_map[b2]->first_ending.getPosition().y + 5), sf::Color::Green));
+
+		}
+	}
 
 	temp_wire->wire.setPrimitiveType ( sf::LinesStrip ) ;
 	vector_draw_wire.push_back(&temp_wire->wire);

@@ -2,7 +2,7 @@
 #define TM_H
 #define WS_W render_window.getSize().x
 #define WS_H render_window.getSize().y
-#define SFGUI_WS_W (render_window.getSize().x - sfgui_window_bar->GetAllocation().width) 
+#define SFGUI_WS_W render_window.getSize().x 
 #define SFGUI_WS_H render_window.getSize().y 
 #define SFGUI_WS_BAR_W sfgui_window_bar->GetAllocation().width
 #define SFGUI_WS_BAR_H render_window.getSize().y
@@ -22,8 +22,11 @@ class Hotwire{
 		sfg::SFGUI sfgui;
 
 		sfg::Canvas::Ptr canvas = sfg::Canvas::Create();
+		sfg::Desktop desktop;
 
 		sf::Mouse mouse;
+
+		sfg::Scrollbar::Ptr scroll_bar = sfg::Scrollbar::Create();
 
 		sfg::Window::Ptr sfgui_window = sfg::Window::Create();
 		sfg::Window::Ptr sfgui_window_menu = sfg::Window::Create();
@@ -39,10 +42,14 @@ class Hotwire{
 		std::vector<std::pair<int, int> > vector_wires;
 		sf::VertexArray wires;
 		std::vector<sf::VertexArray *> vector_draw_wire;
+		std::vector<sf::CircleShape *> vector_draw_circleshape;
 
-		std::string buffer = "empty";
+		std::string buffer = "lamp";
 		int bufferFirstElement = -1;
 		int bufferSecondElement = -1;
+
+
+		bool render_bar = false;
         bool running = false;
 
 		int amountImageX;
