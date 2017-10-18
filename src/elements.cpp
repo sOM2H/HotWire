@@ -6,6 +6,16 @@ void Lamp::setImage(){
 		printf("Init new image: lamp.png\n\n");
 	}
 	image->SetImage(img);
+
+	first_ending.setRadius(5.f);
+	first_ending.setFillColor(sf::Color::White);
+
+	second_ending.setRadius(5.f);
+	second_ending.setFillColor(sf::Color::White);
+
+	first_ending.setPosition(sf::Vector2f(-1, -1)); second_ending.setPosition(sf::Vector2f(-1, -1));
+
+
 }
 
 void Battery::setImage(){
@@ -13,6 +23,14 @@ void Battery::setImage(){
 		printf("Init new image: battery.png\n\n");
 	}
 	image->SetImage(img);
+
+	first_ending.setRadius(5.f);
+	first_ending.setFillColor(sf::Color::White);
+
+	second_ending.setRadius(5.f);
+	second_ending.setFillColor(sf::Color::White);
+
+	first_ending.setPosition(sf::Vector2f(-1, -1)); second_ending.setPosition(sf::Vector2f(-1, -1));
 }
 
 void Resistor::setImage(){
@@ -20,6 +38,14 @@ void Resistor::setImage(){
 		printf("Init new image: resistor.png\n\n");
 	}
 	image->SetImage(img);
+
+	first_ending.setRadius(5.f);
+	first_ending.setFillColor(sf::Color::White);
+
+	second_ending.setRadius(5.f);
+	second_ending.setFillColor(sf::Color::White);
+
+	first_ending.setPosition(sf::Vector2f(-1, -1)); second_ending.setPosition(sf::Vector2f(-1, -1));
 }
 
 
@@ -28,6 +54,14 @@ void Ampermeter::setImage(){
 		printf("Init new image: ampermeter.png\n\n");
 	}
 	image->SetImage(img);
+
+	first_ending.setRadius(5.f);
+	first_ending.setFillColor(sf::Color::White);
+
+	second_ending.setRadius(5.f);
+	second_ending.setFillColor(sf::Color::White);
+
+	first_ending.setPosition(sf::Vector2f(-1, -1)); second_ending.setPosition(sf::Vector2f(-1, -1));
 }
 
 void Voltmeter::setImage(){
@@ -35,6 +69,14 @@ void Voltmeter::setImage(){
 		printf("Init new image: voltmeter.png\n\n");
 	}
 	image->SetImage(img);
+
+	first_ending.setRadius(5.f);
+	first_ending.setFillColor(sf::Color::White);
+
+	second_ending.setRadius(5.f);
+	second_ending.setFillColor(sf::Color::White);
+
+	first_ending.setPosition(sf::Vector2f(-1, -1)); second_ending.setPosition(sf::Vector2f(-1, -1));
 }
 
 void Bell::setImage(){
@@ -42,6 +84,15 @@ void Bell::setImage(){
 		printf("Init new image: bell.png\n\n");
 	}
 	image->SetImage(img);
+
+	first_ending.setRadius(5.f);
+	first_ending.setFillColor(sf::Color::White);
+
+	second_ending.setRadius(5.f);
+	second_ending.setFillColor(sf::Color::White);
+
+	first_ending.setPosition(sf::Vector2f(-1, -1)); 
+	second_ending.setPosition(sf::Vector2f(-1, -1));
 }
 
 

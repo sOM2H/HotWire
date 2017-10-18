@@ -12,6 +12,8 @@ public:
 	int id;
 	virtual void draw() = 0;
 	virtual std::string getType() = 0;
+	sf::CircleShape first_ending;
+	sf::CircleShape second_ending;
 	sf::Image img;
 	sfg::Image::Ptr image = sfg::Image::Create();
 	virtual void setImage() = 0;
