@@ -170,7 +170,13 @@ std::ostream & operator<<(std::ostream & os, sf::FloatRect vec) {
 	os << "(" << vec.left << ", " << vec.top << ", " << vec.width << "x" << vec.height << ")";
 }
 
+
 int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatteries, int &id){
+	if(elements_position_set.count( std::make_pair( ((pos.x/60))*60, ((pos.y/60))*60 )) > 0){
+			return 0;
+	}
+
+	
 	Element * temp;
 
 	if(name == "lamp"){		
@@ -186,14 +192,18 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 		temp = new Voltmeter;
 	} else if(name == "bell"){
 		temp = new Bell;
-
 	} else{
 		return 0;		
 	}
 	
 
+	//std::cout<< "Count element in set: "  <<elements_position_set.count( std::make_pair( ((pos.x/60))*60, ((pos.y/60))*60 )) << "\n\n";
+
     temp->x = ((pos.x/60))*60;
     temp->y = ((pos.y/60))*60;
+
+	elements_position_set.insert(std::make_pair( ((pos.x/60))*60, ((pos.y/60))*60 ));
+
 	temp->id = element_id;
     element_map[id] = temp;
 
@@ -220,6 +230,7 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 			}
 	});
 
+	
 	
 
 	id++;

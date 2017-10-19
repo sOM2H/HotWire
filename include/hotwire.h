@@ -12,6 +12,7 @@
 #include <SFGUI/SFGUI.hpp>
 #include <SFGUI/Widgets.hpp>
 #include <memory>
+#include <set>
 
 class Hotwire{
     public: 
@@ -41,7 +42,10 @@ class Hotwire{
 		sfg::Fixed::Ptr fixed = sfg::Fixed::Create();
 		void init_image(const std::string & name);
 
-		std::map<int , Element* > element_map;	
+		std::map<int , Element* > element_map;
+
+		std::set<std::pair<int, int> > elements_position_set;	
+
 		std::vector<std::pair<int, int> > vector_wires;
 		sf::VertexArray wires;
 		std::vector<sf::VertexArray *> vector_draw_wire;
@@ -50,7 +54,6 @@ class Hotwire{
 		std::string buffer = "empty";
 		int bufferFirstElement = -1;
 		int bufferSecondElement = -1;
-
 
 		bool render_bar = false;
         bool running = false;
