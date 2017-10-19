@@ -7,6 +7,7 @@
 Hotwire::Hotwire()
 	/*: render_window(sf::VideoMode(800, 600), "HotWire", 5)*/
 	: render_window(sf::VideoMode(0, 0), "HotWire", sf::Style::Fullscreen) {
+	render_window.setKeyRepeatEnabled(false);
 }
 
 
@@ -18,11 +19,12 @@ void Hotwire::init(){
     //auto box = sfg::Box::Create();
 
     box->Pack(boxIN, false, false);
-
+	
 	sfgui_window_bar->SetRequisition(sf::Vector2f(0, 180));
 	sfgui_window_bar->SetAllocation(sf::FloatRect(0, 0, 60, 180));
-	sfgui_window_bar->SetStyle(sfg::Window::Style::BACKGROUND);
 	sfgui_window_bar->SetPosition(sf::Vector2f(0.f, 0.f));
+	sfgui_window_bar->SetTitle("Bar");
+
 
 	scrolledwindow->SetScrollbarPolicy(sfg::ScrolledWindow::HORIZONTAL_NEVER |  sfg::ScrolledWindow::VERTICAL_AUTOMATIC);
 	scrolledwindow->SetRequisition(sf::Vector2f(60, 180));
