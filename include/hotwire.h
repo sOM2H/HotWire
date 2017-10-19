@@ -26,7 +26,10 @@ class Hotwire{
 
 		sf::Mouse mouse;
 
-		sfg::Scrollbar::Ptr scroll_bar = sfg::Scrollbar::Create();
+		sfg::ScrolledWindow::Ptr scrolledwindow = sfg::ScrolledWindow::Create();
+
+		sfg::Box::Ptr boxIN = sfg::Box::Create(sfg::Box::Orientation::VERTICAL);
+		sfg::Box::Ptr box = sfg::Box::Create();	
 
 		sfg::Window::Ptr sfgui_window = sfg::Window::Create();
 		sfg::Window::Ptr sfgui_window_menu = sfg::Window::Create();
@@ -44,7 +47,7 @@ class Hotwire{
 		std::vector<sf::VertexArray *> vector_draw_wire;
 		std::vector<sf::CircleShape *> vector_draw_circleshape;
 
-		std::string buffer = "lamp";
+		std::string buffer = "empty";
 		int bufferFirstElement = -1;
 		int bufferSecondElement = -1;
 

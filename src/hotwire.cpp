@@ -5,8 +5,8 @@
 #include <iostream>
 
 Hotwire::Hotwire()
-	: render_window(sf::VideoMode(800, 600), "HotWire", 5)
-	/*: render_window(sf::VideoMode(0, 0), "HotWire", sf::Style::Fullscreen) */{
+	/*: render_window(sf::VideoMode(800, 600), "HotWire", 5)*/
+	: render_window(sf::VideoMode(0, 0), "HotWire", sf::Style::Fullscreen) {
 }
 
 
@@ -14,24 +14,25 @@ void Hotwire::init(){
 
     render_window.resetGLStates();
 	
-    auto boxIN = sfg::Box::Create(sfg::Box::Orientation::VERTICAL);
-    auto box = sfg::Box::Create();
+    //auto boxIN = sfg::Box::Create(sfg::Box::Orientation::VERTICAL);
+    //auto box = sfg::Box::Create();
 
     box->Pack(boxIN, false, false);
-    //box->SetSpacing( 5.f );
 
-	sfgui_window_bar->SetRequisition(sf::Vector2f(0, SFGUI_WS_BAR_H));
-	sfgui_window_bar->SetAllocation(sf::FloatRect(0, 0, 60,SFGUI_WS_BAR_H));
+	sfgui_window_bar->SetRequisition(sf::Vector2f(0, 180));
+	sfgui_window_bar->SetAllocation(sf::FloatRect(0, 0, 60, 180));
 	sfgui_window_bar->SetStyle(sfg::Window::Style::BACKGROUND);
 	sfgui_window_bar->SetPosition(sf::Vector2f(0.f, 0.f));
+
+	scrolledwindow->SetScrollbarPolicy(sfg::ScrolledWindow::HORIZONTAL_NEVER |  sfg::ScrolledWindow::VERTICAL_AUTOMATIC);
+	scrolledwindow->SetRequisition(sf::Vector2f(60, 180));
+
 
 
     bool & running_ref = running;
     std::string & buffer_ref = buffer;
  
-
     auto image_lamp = sfg::Image::Create();
- 
 
     std::string images[] = {
 	"lamp", "battery", "resistor", "ampermeter", "voltmeter", "bell"
@@ -56,33 +57,22 @@ void Hotwire::init(){
 	    element_making(buffer_ref, sf::Vector2i(mouse.getPosition(render_window).x, mouse.getPosition(render_window).y), amountOfBatteries, element_id);
 	});
 
-	sfgui_window->GetSignal(sfg::Window::OnMouseRightPress).Connect([&]{
-			render_bar = true;
-			sfgui_window_bar->SetPosition(sf::Vector2f(mouse.getPosition(render_window).x, mouse.getPosition(render_window).y));
-			if(render_bar){
-		   		//desktop.BringToFront(sfgui_window_bar);
-			}
-	});
-
     boxIN->Pack(image_map["lamp"]);
     boxIN->Pack(image_map["resistor"]);
     boxIN->Pack(image_map["battery"]);
     boxIN->Pack(image_map["bell"]);
     boxIN->Pack(image_map["ampermeter"]);
     boxIN->Pack(image_map["voltmeter"]);
-		
-    canvas->SetRequisition(sf::Vector2f(SFGUI_WS_W, SFGUI_WS_H));
-	auto boxx = sfg::Box::Create();
-	fixed->Put(canvas, sf::Vector2f(0, 0));
-	//fixed->Put(canvas, sf::Vector2f(30, 25));
-	sfgui_window->Add(fixed);
-	//scroll_bar->SetPosition();
-	//scroll_bar->SetRequisition(sf::Vector2f(SFGUI_WS_BAR_W, SFGUI_WS_BAR_H));
 
-   	sfgui_window_bar->Add( box);
- 	
+
+    canvas->SetRequisition(sf::Vector2f(SFGUI_WS_W, SFGUI_WS_H));
+	fixed->Put(canvas, sf::Vector2f(0, 0));
+	sfgui_window->Add(fixed);
+	sfgui_window_bar->Add(scrolledwindow);
+
+	scrolledwindow->AddWithViewport(box);
 	desktop.Add( sfgui_window );
-	desktop.Add( sfgui_window_bar );
+	desktop.Add( sfgui_window_bar);
 	desktop.BringToFront( sfgui_window);
 
     running = true;
@@ -112,9 +102,24 @@ void Hotwire::init(){
 void Hotwire::handle_events(){
     sf::Event event;
     while (render_window.pollEvent(event)){
-        if (event.type == sf::Event::Closed || event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape){
+        if(event.type == sf::Event::Closed || event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape){
             running = false;
 		}
+
+		if(event.type == sf::Event::KeyPressed){
+			if(event.key.code == sf::Keyboard::Space){		
+				if(!render_bar){
+					sfgui_window_bar->SetPosition(sf::Vector2f(mouse.getPosition(render_window).x, mouse.getPosition(render_window).y));
+					desktop.BringToFront(sfgui_window_bar);
+					render_bar = true;
+				}else{
+					sfgui_window_bar->SetPosition(sf::Vector2f(SFGUI_WS_W, SFGUI_WS_H));
+					desktop.BringToFront(sfgui_window);		
+					render_bar = false;
+				}
+			}
+		}
+
 		sfgui_window->HandleEvent( event );	
 		sfgui_window_bar->HandleEvent( event );	
 	}
@@ -133,6 +138,7 @@ void Hotwire::render(){
 		canvas->Draw(*vector_draw_circleshape[i]);
 	}
 	canvas->Display();
+	canvas->Unbind();
 	canvas->Unbind();
     sfgui.Display( render_window );
     render_window.display();
@@ -219,7 +225,7 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 	std::cout<< "Creating new element: " << name <<".\n" << "	id: "<< temp->id << "\n" << "	Position:\n" << "		x: " << temp->x << "\n" << "		y: " << temp->y << "\n";
 	std::cout<< "////// End INFO //////\n\n";
 	
-	buffer = "lamp";
+	buffer = "empty";
 	std::cout<< "buffer: "<< buffer << "\n\n";
 	sfg::Widget::Ptr canvas = fixed->GetChildren().back();
 	fixed->Remove(canvas);
@@ -380,8 +386,8 @@ int Hotwire::wire_making(int b1, int b2){
 
 			temp_wire->wire.append(sf::Vertex(
 						sf::Vector2f( 
-							element_map[b1]->first_ending.getPosition().x + 5, 
-							element_map[b1]->first_ending.getPosition().y + 5), 
+							element_map[b1]->second_ending.getPosition().x + 5, 
+							element_map[b1]->second_ending.getPosition().y + 5), 
 					sf::Color::Red));
 
 
