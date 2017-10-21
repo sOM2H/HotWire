@@ -95,6 +95,55 @@ void Bell::setImage(){
 	second_ending.setPosition(sf::Vector2f(-1, -1));
 }
 
+void Coil::setImage(){
+	if(img.loadFromFile( "src/textures/coil.png" )){
+		printf("Init new image: coil.png\n\n");
+	}
+	image->SetImage(img);
+
+	first_ending.setRadius(5.f);
+	first_ending.setFillColor(sf::Color::White);
+
+	second_ending.setRadius(5.f);
+	second_ending.setFillColor(sf::Color::White);
+
+	first_ending.setPosition(sf::Vector2f(-1, -1)); 
+	second_ending.setPosition(sf::Vector2f(-1, -1));
+}
+
+
+
+void Transistor::setImage(){
+	if(img.loadFromFile( "src/textures/transistor.png" )){
+		printf("Init new image: transistor.png\n\n");
+	}
+	image->SetImage(img);
+
+	first_ending.setRadius(5.f);
+	first_ending.setFillColor(sf::Color::White);
+
+	second_ending.setRadius(5.f);
+	second_ending.setFillColor(sf::Color::White);
+
+	first_ending.setPosition(sf::Vector2f(-1, -1)); 
+	second_ending.setPosition(sf::Vector2f(-1, -1));
+}
+
+void Switch::setImage(){
+	if(img.loadFromFile( "src/textures/switch.png" )){
+		printf("Init new image: switch.png\n\n");
+	}
+	image->SetImage(img);
+
+	first_ending.setRadius(5.f);
+	first_ending.setFillColor(sf::Color::White);
+
+	second_ending.setRadius(5.f);
+	second_ending.setFillColor(sf::Color::White);
+
+	first_ending.setPosition(sf::Vector2f(-1, -1)); 
+	second_ending.setPosition(sf::Vector2f(-1, -1));
+}
 
 void Lamp::draw(){
 }
@@ -147,3 +196,24 @@ std::string Bell::getType(){
 	return "bell";
 }
 
+
+void Coil::draw(){
+}
+
+std::string Coil::getType(){
+	return "coil";
+}
+
+void Transistor::draw(){
+}
+
+std::string Transistor::getType(){
+	return "transistor";
+}
+
+void Switch::draw(){
+}
+
+std::string Switch::getType(){
+	return "switch";
+}

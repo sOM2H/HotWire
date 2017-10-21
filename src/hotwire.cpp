@@ -39,7 +39,7 @@ void Hotwire::init(){
     auto image_lamp = sfg::Image::Create();
 
     std::string images[] = {
-	"lamp", "battery", "resistor", "ampermeter", "voltmeter", "bell"
+	"lamp", "battery", "resistor", "ampermeter", "voltmeter", "bell", "coil", "transistor", "switch"
     };
 
     for (const std::string & name : images) {
@@ -51,8 +51,11 @@ void Hotwire::init(){
     image_map["battery"]->GetSignal(sfg::Image::OnMouseLeftPress).Connect([&buffer_ref]{buffer_ref = "battery"; std::cout << "buffer: battery\n";});
     image_map["resistor"]->GetSignal(sfg::Image::OnMouseLeftPress).Connect([&buffer_ref]{buffer_ref = "resistor"; std::cout << "buffer: resistor\n";});
     image_map["ampermeter"]->GetSignal(sfg::Image::OnMouseLeftPress).Connect([&buffer_ref]{buffer_ref = "ampermeter"; std::cout << "buffer: ampermeter\n";});
+	image_map["transistor"]->GetSignal(sfg::Image::OnMouseLeftPress).Connect([&buffer_ref]{buffer_ref = "transistor"; std::cout << "buffer: transistor\n";});
     image_map["voltmeter"]->GetSignal(sfg::Image::OnMouseLeftPress).Connect([&buffer_ref]{buffer_ref = "voltmeter"; std::cout << "buffer: voltmeter\n";});
+	image_map["switch"]->GetSignal(sfg::Image::OnMouseLeftPress).Connect([&buffer_ref]{buffer_ref = "switch"; std::cout << "buffer: switch\n";});
     image_map["bell"]->GetSignal(sfg::Image::OnMouseLeftPress).Connect([&buffer_ref]{buffer_ref = "bell"; std::cout << "buffer: bell\n";});
+	image_map["coil"]->GetSignal(sfg::Image::OnMouseLeftPress).Connect([&buffer_ref]{buffer_ref = "coil"; std::cout << "buffer: coil\n";});
 
     sfgui_window->GetSignal(sfg::Window::OnMouseLeftPress).Connect([&]{
 		std::cout << "********************\n";
@@ -65,6 +68,9 @@ void Hotwire::init(){
     boxIN->Pack(image_map["resistor"]);
     boxIN->Pack(image_map["battery"]);
     boxIN->Pack(image_map["bell"]);
+	boxIN->Pack(image_map["transistor"]);
+	boxIN->Pack(image_map["switch"]);
+	boxIN->Pack(image_map["coil"]);
     boxIN->Pack(image_map["ampermeter"]);
     boxIN->Pack(image_map["voltmeter"]);
 
@@ -201,7 +207,13 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 		temp = new Voltmeter;
 	} else if(name == "bell"){
 		temp = new Bell;
-	} else{
+	} else if(name == "coil"){
+		temp = new Coil;
+	}else if(name == "transistor"){
+		temp = new Transistor;
+	} else if(name == "switch"){
+		temp = new Switch;
+	}else{
 		return 0;		
 	}
 	
@@ -259,11 +271,7 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 int Hotwire::wire_making(int b1, int b2){
 
 	Wire * temp_wire = new Wire;
-	std::cout<< "New wire\n";
-
-	vector_wires.push_back(std::make_pair(b1, b2));
-	vector_wires.push_back(std::make_pair(b2, b1));
-
+	int C_wire_amout = wire_id;
 	
 	if(element_map[b1]->x > element_map[b2]->x){
 
@@ -1501,6 +1509,10 @@ int Hotwire::wire_making(int b1, int b2){
 		}
 		
 
+	if(C_wire_amout != wire_id){
+
+	vector_wires.push_back(std::make_pair(b1, b2));
+	vector_wires.push_back(std::make_pair(b2, b1));
 
 	temp_wire->wire.setPrimitiveType ( sf::LinesStrip ) ;
 	vector_draw_wire.push_back(&temp_wire->wire);
@@ -1510,6 +1522,7 @@ int Hotwire::wire_making(int b1, int b2){
 
 	bufferFirstElement = -1;
 	bufferSecondElement = -1;
+	}
 }
 
 

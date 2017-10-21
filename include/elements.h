@@ -14,6 +14,8 @@ public:
 	virtual std::string getType() = 0;
 	sf::CircleShape first_ending;
 	sf::CircleShape second_ending;
+	int state_first_ending = -1;
+	int state_second_ending = -1;
 	sf::Image img;
 	sfg::Image::Ptr image = sfg::Image::Create();
 	virtual void setImage() = 0;
@@ -92,5 +94,36 @@ public:
 	std::string getType();
 };
 
+
+class Coil : public Element{
+public:
+	Coil(){}
+	~Coil();
+    float resistance = 0;
+    void draw();
+	void setImage();
+	std::string getType();
+};
+
+
+class Transistor : public Element{
+public:
+	Transistor(){}
+	~Transistor();
+    float resistance = 0;
+    void draw();
+	void setImage();
+	std::string getType();
+};
+
+class Switch : public Element{
+public:
+	Switch(){}
+	~Switch();
+    float resistance = 0;
+    void draw();
+	void setImage();
+	std::string getType();
+};
 
 #endif
