@@ -329,7 +329,7 @@ int Hotwire::wire_making(int b1, int b2){
 								sf::Vector2f(
 									element_map[b2]->first_ending.getPosition().x + 5,
 									element_map[b1]->first_ending.getPosition().y + 5),
-							sf::Color::Yellow));
+							sf::Color::Magenta));
 
 
 					temp_wire->wire.append(sf::Vertex(
@@ -347,7 +347,7 @@ int Hotwire::wire_making(int b1, int b2){
 					wire_id++;	
 
 					element_map[b1]->state_second_ending = wire_id;
-					element_map[b2]->state_first_ending = wire_id;
+					element_map[b2]->state_second_ending = wire_id;
 
 					temp_wire->wire.append(sf::Vertex(
 							sf::Vector2f(
@@ -367,6 +367,7 @@ int Hotwire::wire_making(int b1, int b2){
 									element_map[b2]->second_ending.getPosition().x + 5, 
 									element_map[b2]->second_ending.getPosition().y + 5), 
 							sf::Color::Green));
+
 				}else if(element_map[b2]->state_first_ending  == -1){
 					wire_id++;	
 
@@ -449,14 +450,14 @@ int Hotwire::wire_making(int b1, int b2){
 											sf::Vector2f( 
 												element_map[b1]->first_ending.getPosition().x + 5 , 
 												element_map[b1]->first_ending.getPosition().y + 5 - 30), 
-										sf::Color::Red));
+										sf::Color::Magenta));
 
 
 								temp_wire->wire.append(sf::Vertex(
 											sf::Vector2f( 
 												element_map[b2]->first_ending.getPosition().x + 5, 
 												element_map[b2]->first_ending.getPosition().y + 5 - 30), 
-										sf::Color::Green));
+										sf::Color::Yellow));
 
 
 								temp_wire->wire.append(sf::Vertex(
@@ -482,14 +483,14 @@ int Hotwire::wire_making(int b1, int b2){
 											sf::Vector2f( 
 												element_map[b1]->second_ending.getPosition().x + 5 , 
 												element_map[b1]->second_ending.getPosition().y + 5 - 60), 
-										sf::Color::Red));
+										sf::Color::Magenta));
 
 
 								temp_wire->wire.append(sf::Vertex(
 											sf::Vector2f( 
 												element_map[b2]->second_ending.getPosition().x + 5, 
 												element_map[b2]->second_ending.getPosition().y + 5 - 60), 
-										sf::Color::Green));
+										sf::Color::Yellow));
 
 
 								temp_wire->wire.append(sf::Vertex(
@@ -514,14 +515,14 @@ int Hotwire::wire_making(int b1, int b2){
 											sf::Vector2f( 
 												element_map[b1]->second_ending.getPosition().x + 5 , 
 												element_map[b1]->second_ending.getPosition().y + 5 - 60), 
-										sf::Color::Red));
+										sf::Color::Magenta));
 
 
 								temp_wire->wire.append(sf::Vertex(
 											sf::Vector2f( 
 												element_map[b2]->first_ending.getPosition().x + 5, 
 												element_map[b2]->first_ending.getPosition().y + 5 - 60), 
-										sf::Color::Green));
+										sf::Color::Yellow));
 
 
 								temp_wire->wire.append(sf::Vertex(
@@ -559,7 +560,7 @@ int Hotwire::wire_making(int b1, int b2){
 												(element_map[b2]->second_ending.getPosition().x + 5))/2, 
 
 										element_map[b1]->first_ending.getPosition().y + 5), 
-								sf::Color::Yellow));
+								sf::Color::Magenta));
 						
 						
 						temp_wire->wire.append(sf::Vertex(
@@ -598,7 +599,7 @@ int Hotwire::wire_making(int b1, int b2){
 										(element_map[b2]->second_ending.getPosition().y + 5) -  
 											( (element_map[b2]->second_ending.getPosition().y + 5) -
 											  (element_map[b1]->first_ending.getPosition().y + 5) )/2 ), 
-								sf::Color::Yellow));
+								sf::Color::Magenta));
 
 
 						temp_wire->wire.append(sf::Vertex(
@@ -630,14 +631,14 @@ int Hotwire::wire_making(int b1, int b2){
 									sf::Vector2f( 
 										element_map[b1]->second_ending.getPosition().x + 5, 
 										element_map[b1]->second_ending.getPosition().y + 5), 
-								sf::Color::Yellow));
+								sf::Color::Red));
 
 
 						temp_wire->wire.append(sf::Vertex(
 									sf::Vector2f( 
 										element_map[b1]->second_ending.getPosition().x + 5, 
 										element_map[b2]->second_ending.getPosition().y + 5), 
-								sf::Color::Yellow));
+								sf::Color::Magenta));
 
 
 						temp_wire->wire.append(sf::Vertex(
@@ -667,7 +668,7 @@ int Hotwire::wire_making(int b1, int b2){
 										(element_map[b2]->first_ending.getPosition().y + 5) -  
 											( (element_map[b2]->first_ending.getPosition().y + 5) -
 											  (element_map[b1]->second_ending.getPosition().y + 5) )/2 ), 
-								sf::Color::Yellow));
+								sf::Color::Magenta));
 
 
 						temp_wire->wire.append(sf::Vertex(
@@ -734,7 +735,7 @@ int Hotwire::wire_making(int b1, int b2){
 										(element_map[b2]->second_ending.getPosition().y + 5) -  
 											( (element_map[b2]->second_ending.getPosition().y + 5) -
 											  (element_map[b1]->first_ending.getPosition().y + 5) )/2 ), 
-								sf::Color::Yellow));
+								sf::Color::Magenta));
 
 						temp_wire->wire.append(sf::Vertex(
 									sf::Vector2f( 
@@ -776,7 +777,7 @@ int Hotwire::wire_making(int b1, int b2){
 										(element_map[b1]->second_ending.getPosition().y + 5) -  
 											( (element_map[b1]->second_ending.getPosition().y + 5) -
 											  (element_map[b2]->first_ending.getPosition().y + 5) )/2 ), 
-								sf::Color::Yellow));
+								sf::Color::Magenta));
 
 
 						temp_wire->wire.append(sf::Vertex(
@@ -859,7 +860,7 @@ int Hotwire::wire_making(int b1, int b2){
 											(element_map[b2]->second_ending.getPosition().y + 5) -  
 												( (element_map[b2]->second_ending.getPosition().y + 5) -
 												  (element_map[b1]->first_ending.getPosition().y + 5) )/2 ), 
-									sf::Color::Yellow));
+									sf::Color::Magenta));
 
 							temp_wire->wire.append(sf::Vertex(
 										sf::Vector2f( 
@@ -901,7 +902,7 @@ int Hotwire::wire_making(int b1, int b2){
 											(element_map[b1]->second_ending.getPosition().y + 5) -  
 												( (element_map[b1]->second_ending.getPosition().y + 5) -
 												  (element_map[b2]->first_ending.getPosition().y + 5) )/2 ), 
-									sf::Color::Yellow));
+									sf::Color::Magenta));
 
 
 							temp_wire->wire.append(sf::Vertex(
@@ -1006,7 +1007,7 @@ int Hotwire::wire_making(int b1, int b2){
 									sf::Vector2f(
 										element_map[b2]->second_ending.getPosition().x + 5,
 										element_map[b1]->second_ending.getPosition().y + 5),
-								sf::Color::Yellow));
+								sf::Color::Magenta));
 
 
 						temp_wire->wire.append(sf::Vertex(
@@ -1041,7 +1042,7 @@ int Hotwire::wire_making(int b1, int b2){
 										(element_map[b1]->first_ending.getPosition().y + 5) -  
 											( (element_map[b1]->first_ending.getPosition().y + 5) -
 											  (element_map[b2]->first_ending.getPosition().y + 5) )/2 ), 
-								sf::Color::Yellow));
+								sf::Color::Magenta));
 
 
 						temp_wire->wire.append(sf::Vertex(
@@ -1051,7 +1052,7 @@ int Hotwire::wire_making(int b1, int b2){
 										(element_map[b1]->first_ending.getPosition().y + 5) -  
 											( (element_map[b1]->first_ending.getPosition().y + 5) -
 											  (element_map[b2]->first_ending.getPosition().y + 5) )/2 ), 
-								sf::Color::Magenta));
+								sf::Color::Yellow));
 
 
 						temp_wire->wire.append(sf::Vertex(
@@ -1124,7 +1125,7 @@ int Hotwire::wire_making(int b1, int b2){
 												sf::Vector2f( 
 													element_map[b2]->first_ending.getPosition().x + 5, 
 													element_map[b2]->first_ending.getPosition().y + 5), 
-											sf::Color::Green));
+											sf::Color::Magenta));
 
 								}else if(element_map[b2]->state_second_ending == -1){
 
@@ -1143,14 +1144,14 @@ int Hotwire::wire_making(int b1, int b2){
 												sf::Vector2f( 
 													element_map[b1]->second_ending.getPosition().x + 5 , 
 													element_map[b1]->second_ending.getPosition().y + 5 - 30), 
-											sf::Color::Red));
+											sf::Color::Magenta));
 
 
 									temp_wire->wire.append(sf::Vertex(
 												sf::Vector2f( 
 													element_map[b2]->second_ending.getPosition().x + 5, 
 													element_map[b2]->second_ending.getPosition().y + 5 - 30), 
-											sf::Color::Green));
+											sf::Color::Yellow));
 
 
 									temp_wire->wire.append(sf::Vertex(
@@ -1177,14 +1178,14 @@ int Hotwire::wire_making(int b1, int b2){
 												sf::Vector2f( 
 													element_map[b1]->second_ending.getPosition().x + 5 , 
 													element_map[b1]->second_ending.getPosition().y + 5 - 60), 
-											sf::Color::Red));
+											sf::Color::Magenta));
 
 
 									temp_wire->wire.append(sf::Vertex(
 												sf::Vector2f( 
 													element_map[b2]->first_ending.getPosition().x + 5, 
 													element_map[b2]->first_ending.getPosition().y + 5 - 60), 
-											sf::Color::Green));
+											sf::Color::Yellow));
 
 
 									temp_wire->wire.append(sf::Vertex(
@@ -1209,14 +1210,14 @@ int Hotwire::wire_making(int b1, int b2){
 												sf::Vector2f( 
 													element_map[b1]->second_ending.getPosition().x + 5 , 
 													element_map[b1]->second_ending.getPosition().y + 5 - 60), 
-											sf::Color::Red));
+											sf::Color::Magenta));
 
 
 									temp_wire->wire.append(sf::Vertex(
 												sf::Vector2f( 
 													element_map[b2]->second_ending.getPosition().x + 5, 
 													element_map[b2]->second_ending.getPosition().y + 5 - 60), 
-											sf::Color::Green));
+											sf::Color::Yellow));
 
 
 									temp_wire->wire.append(sf::Vertex(
