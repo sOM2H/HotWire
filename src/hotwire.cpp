@@ -20,14 +20,16 @@ void Hotwire::init(){
 
     box->Pack(boxIN, false, false);
 	
-	sfgui_window_bar->SetRequisition(sf::Vector2f(0, 180));
-	sfgui_window_bar->SetAllocation(sf::FloatRect(0, 0, 60, 180));
+	sfgui_window_bar->SetRequisition(sf::Vector2f(0, 240));
+	sfgui_window_bar->SetAllocation(sf::FloatRect(0, 0, 60, 240));
 	sfgui_window_bar->SetPosition(sf::Vector2f(0.f, 0.f));
 	sfgui_window_bar->SetTitle("Bar");
+ 		
+	sfgui_window_bar->SetPosition(sf::Vector2f(0, 0));
 
 
 	scrolledwindow->SetScrollbarPolicy(sfg::ScrolledWindow::HORIZONTAL_NEVER |  sfg::ScrolledWindow::VERTICAL_AUTOMATIC);
-	scrolledwindow->SetRequisition(sf::Vector2f(60, 180));
+	scrolledwindow->SetRequisition(sf::Vector2f(60, 240));
 
 
 
@@ -111,14 +113,21 @@ void Hotwire::handle_events(){
 		if(event.type == sf::Event::KeyPressed){
 			if(event.key.code == sf::Keyboard::Space){		
 				if(!render_bar){
-					sfgui_window_bar->SetPosition(sf::Vector2f(mouse.getPosition(render_window).x, mouse.getPosition(render_window).y));
+					sfgui_window_bar->SetPosition(sf::Vector2f(pos_bar.x, pos_bar.y));
 					desktop.BringToFront(sfgui_window_bar);
 					render_bar = true;
 				}else{
+					pos_bar.x = sfgui_window_bar->GetAllocation().left;
+					pos_bar.y = sfgui_window_bar->GetAllocation().top;
 					sfgui_window_bar->SetPosition(sf::Vector2f(SFGUI_WS_W, SFGUI_WS_H));
 					desktop.BringToFront(sfgui_window);		
 					render_bar = false;
 				}
+			}
+			if(event.key.code == sf::Keyboard::Tab){
+					sfgui_window_bar->SetPosition(sf::Vector2f(0 ,0));
+					desktop.BringToFront(sfgui_window_bar);
+					render_bar = true;
 			}
 		}
 
@@ -255,204 +264,998 @@ int Hotwire::wire_making(int b1, int b2){
 	vector_wires.push_back(std::make_pair(b1, b2));
 	vector_wires.push_back(std::make_pair(b2, b1));
 
+	
 	if(element_map[b1]->x > element_map[b2]->x){
 
 		if(element_map[b1]->y > element_map[b2]->y){
+	
+			if(element_map[b1]->state_first_ending == -1){
+
+				if(element_map[b2]->state_second_ending == -1){
+
+					wire_id++;
+
+					element_map[b1]->state_first_ending = wire_id;
+					element_map[b2]->state_second_ending = wire_id;
+
+					temp_wire->wire.append(sf::Vertex(
+							sf::Vector2f(
+								element_map[b1]->first_ending.getPosition().x + 5,
+								element_map[b1]->first_ending.getPosition().y + 5),
+						sf::Color::Red));
 
 
-			temp_wire->wire.append(sf::Vertex(
-					sf::Vector2f(
-						element_map[b1]->first_ending.getPosition().x + 5,
-					   	element_map[b1]->first_ending.getPosition().y + 5),
-				sf::Color::Red));
+					temp_wire->wire.append(sf::Vertex(
+								sf::Vector2f(
+									(element_map[b1]->first_ending.getPosition().x + 5) - 
+										((element_map[b1]->first_ending.getPosition().x + 5) - 
+											(element_map[b2]->second_ending.getPosition().x + 5))/2,
+
+									element_map[b1]->first_ending.getPosition().y + 5) ,
+							sf::Color::Magenta));
 
 
-			temp_wire->wire.append(sf::Vertex(
-						sf::Vector2f(
-							(element_map[b1]->first_ending.getPosition().x + 5) - 
-								((element_map[b1]->first_ending.getPosition().x + 5) - 
-								 	(element_map[b2]->second_ending.getPosition().x + 5))/2,
+					temp_wire->wire.append(sf::Vertex(
+								sf::Vector2f(
+									element_map[b1]->first_ending.getPosition().x + 5 - 
+										((element_map[b1]->first_ending.getPosition().x + 5) - 
+											(element_map[b2]->second_ending.getPosition().x + 5))/2,
 
-						   	element_map[b1]->first_ending.getPosition().y + 5) ,
-					sf::Color::Magenta));
-
-
-			temp_wire->wire.append(sf::Vertex(
-						sf::Vector2f(
-							element_map[b1]->first_ending.getPosition().x + 5 - 
-								((element_map[b1]->first_ending.getPosition().x + 5) - 
-									(element_map[b2]->second_ending.getPosition().x + 5))/2,
-
-							element_map[b2]->second_ending.getPosition().y + 5),
-					sf::Color::Yellow));
+									element_map[b2]->second_ending.getPosition().y + 5),
+							sf::Color::Yellow));
 
 
-			temp_wire->wire.append(sf::Vertex(
-						sf::Vector2f(
-							element_map[b2]->second_ending.getPosition().x + 5, 
-							element_map[b2]->second_ending.getPosition().y + 5), 
-					sf::Color::Green));
+					temp_wire->wire.append(sf::Vertex(
+								sf::Vector2f(
+									element_map[b2]->second_ending.getPosition().x + 5, 
+									element_map[b2]->second_ending.getPosition().y + 5), 
+							sf::Color::Green));
+
+				}else if(element_map[b2]->state_first_ending == -1){
+					
+					wire_id++;
+		
+					element_map[b1]->state_first_ending = wire_id;
+					element_map[b2]->state_first_ending = wire_id;
+
+					temp_wire->wire.append(sf::Vertex(
+							sf::Vector2f(
+								element_map[b1]->first_ending.getPosition().x + 5,
+								element_map[b1]->first_ending.getPosition().y + 5),
+						sf::Color::Red));
+
+				
+					temp_wire->wire.append(sf::Vertex(
+								sf::Vector2f(
+									element_map[b2]->first_ending.getPosition().x + 5,
+									element_map[b1]->first_ending.getPosition().y + 5),
+							sf::Color::Yellow));
 
 
-		}else if(element_map[b1]->y == element_map[b2]->y){			
-
-			temp_wire->wire.append(sf::Vertex(
-						sf::Vector2f( 
-							element_map[b1]->first_ending.getPosition().x + 5, 
-							element_map[b1]->first_ending.getPosition().y + 5), 
-					sf::Color::Red));
-
-
-			temp_wire->wire.append(sf::Vertex(
-						sf::Vector2f( 
-							element_map[b2]->second_ending.getPosition().x + 5, 
-							element_map[b2]->second_ending.getPosition().y + 5), 
-					sf::Color::Green));
-
-		}else{
-
-			temp_wire->wire.append(sf::Vertex(
-						sf::Vector2f( 
-							element_map[b1]->first_ending.getPosition().x + 5, 
-							element_map[b1]->first_ending.getPosition().y + 5), 
-					sf::Color::Red));
-
-			temp_wire->wire.append(sf::Vertex(
-						sf::Vector2f( 
-							(element_map[b1]->first_ending.getPosition().x + 5) - 
-								((element_map[b1]->first_ending.getPosition().x + 5) - 
-									(element_map[b2]->second_ending.getPosition().x + 5))/2, 
-
-							element_map[b1]->first_ending.getPosition().y + 5), 
-					sf::Color::Yellow));
-			
-			
-			temp_wire->wire.append(sf::Vertex(
-						sf::Vector2f( 
-							(element_map[b1]->first_ending.getPosition().x + 5) - 
-								((element_map[b1]->first_ending.getPosition().x + 5) - 
-									(element_map[b2]->second_ending.getPosition().x + 5))/2, 
-
-							element_map[b2]->second_ending.getPosition().y + 5), 
-					sf::Color::Yellow));
+					temp_wire->wire.append(sf::Vertex(
+								sf::Vector2f(
+									element_map[b2]->first_ending.getPosition().x + 5, 
+									element_map[b2]->first_ending.getPosition().y + 5), 
+							sf::Color::Green));
+				}
 
 
-			temp_wire->wire.append(sf::Vertex(
-						sf::Vector2f( 
-							element_map[b2]->second_ending.getPosition().x + 5, 
-							element_map[b2]->second_ending.getPosition().y + 5), 
-					sf::Color::Green));
+			}else if(element_map[b1]->state_second_ending == -1){
 
-		}
+				if(element_map[b2]->state_second_ending == -1){
+
+					wire_id++;	
+
+					element_map[b1]->state_second_ending = wire_id;
+					element_map[b2]->state_first_ending = wire_id;
+
+					temp_wire->wire.append(sf::Vertex(
+							sf::Vector2f(
+								element_map[b1]->second_ending.getPosition().x + 5,
+								element_map[b1]->second_ending.getPosition().y + 5),
+						sf::Color::Red));
+
+
+					temp_wire->wire.append(sf::Vertex(
+								sf::Vector2f(
+									element_map[b1]->second_ending.getPosition().x + 5,
+									element_map[b2]->second_ending.getPosition().y + 5) ,
+							sf::Color::Magenta));
+
+					temp_wire->wire.append(sf::Vertex(
+								sf::Vector2f(
+									element_map[b2]->second_ending.getPosition().x + 5, 
+									element_map[b2]->second_ending.getPosition().y + 5), 
+							sf::Color::Green));
+				}else if(element_map[b2]->state_first_ending  == -1){
+					wire_id++;	
+
+					element_map[b1]->state_second_ending = wire_id;
+					element_map[b2]->state_first_ending = wire_id;
+				
+
+					temp_wire->wire.append(sf::Vertex(
+							sf::Vector2f(
+								element_map[b1]->second_ending.getPosition().x + 5,
+								element_map[b1]->second_ending.getPosition().y + 5),
+						sf::Color::Red));
+
+
+					temp_wire->wire.append(sf::Vertex(
+								sf::Vector2f(
+									element_map[b1]->second_ending.getPosition().x + 5,
+
+									(element_map[b1]->second_ending.getPosition().y + 5) - 
+										( (  element_map[b1]->second_ending.getPosition().y + 5)  - 
+											( element_map[b2]->first_ending.getPosition().y + 5) )/2 ) ,
+							sf::Color::Magenta));
+
+
+					temp_wire->wire.append(sf::Vertex(
+								sf::Vector2f(
+									element_map[b2]->first_ending.getPosition().x + 5,	
+									(element_map[b1]->second_ending.getPosition().y + 5) - 
+										( (  element_map[b1]->second_ending.getPosition().y + 5)  - 
+											( element_map[b2]->first_ending.getPosition().y + 5) )/2 ) ,
+							sf::Color::Yellow));
+
+
+					temp_wire->wire.append(sf::Vertex(
+								sf::Vector2f(
+									element_map[b2]->first_ending.getPosition().x + 5, 
+									element_map[b2]->first_ending.getPosition().y + 5), 
+							sf::Color::Green));
+				}
+
+			}	
+				
+		}else if(element_map[b1]->y == element_map[b2]->y){		
+			if(element_map[b1]->x > element_map[b2]->x){
+				if(element_map[b1]->state_first_ending == -1){
+							if(element_map[b2]->state_second_ending == -1){
+
+								wire_id++;	
+
+								element_map[b1]->state_first_ending = wire_id;
+								element_map[b2]->state_second_ending = wire_id;
+
+								temp_wire->wire.append(sf::Vertex(
+											sf::Vector2f( 
+												element_map[b1]->first_ending.getPosition().x + 5, 
+												element_map[b1]->first_ending.getPosition().y + 5), 
+										sf::Color::Red));
+
+
+								temp_wire->wire.append(sf::Vertex(
+											sf::Vector2f( 
+												element_map[b2]->second_ending.getPosition().x + 5, 
+												element_map[b2]->second_ending.getPosition().y + 5), 
+										sf::Color::Green));
+
+							}else if(element_map[b2]->state_first_ending == -1){
+
+								wire_id++;	
+
+								element_map[b1]->state_first_ending = wire_id;
+								element_map[b2]->state_first_ending = wire_id;
+
+								temp_wire->wire.append(sf::Vertex(
+											sf::Vector2f( 
+												element_map[b1]->first_ending.getPosition().x + 5, 
+												element_map[b1]->first_ending.getPosition().y + 5), 
+										sf::Color::Red));
+								
+								temp_wire->wire.append(sf::Vertex(
+											sf::Vector2f( 
+												element_map[b1]->first_ending.getPosition().x + 5 , 
+												element_map[b1]->first_ending.getPosition().y + 5 - 30), 
+										sf::Color::Red));
+
+
+								temp_wire->wire.append(sf::Vertex(
+											sf::Vector2f( 
+												element_map[b2]->first_ending.getPosition().x + 5, 
+												element_map[b2]->first_ending.getPosition().y + 5 - 30), 
+										sf::Color::Green));
+
+
+								temp_wire->wire.append(sf::Vertex(
+											sf::Vector2f( 
+												element_map[b2]->first_ending.getPosition().x + 5, 
+												element_map[b2]->first_ending.getPosition().y + 5), 
+										sf::Color::Green));
+							}
+				}else if(element_map[b1]->state_second_ending == -1){
+					if(element_map[b2]->state_second_ending == -1){
+
+						wire_id++;	
+
+						element_map[b1]->state_second_ending = wire_id;
+						element_map[b2]->state_second_ending = wire_id;
+								temp_wire->wire.append(sf::Vertex(
+											sf::Vector2f( 
+												element_map[b1]->second_ending.getPosition().x + 5, 
+												element_map[b1]->second_ending.getPosition().y + 5), 
+										sf::Color::Red));
+								
+								temp_wire->wire.append(sf::Vertex(
+											sf::Vector2f( 
+												element_map[b1]->second_ending.getPosition().x + 5 , 
+												element_map[b1]->second_ending.getPosition().y + 5 - 60), 
+										sf::Color::Red));
+
+
+								temp_wire->wire.append(sf::Vertex(
+											sf::Vector2f( 
+												element_map[b2]->second_ending.getPosition().x + 5, 
+												element_map[b2]->second_ending.getPosition().y + 5 - 60), 
+										sf::Color::Green));
+
+
+								temp_wire->wire.append(sf::Vertex(
+											sf::Vector2f( 
+												element_map[b2]->second_ending.getPosition().x + 5, 
+												element_map[b2]->second_ending.getPosition().y + 5), 
+										sf::Color::Green));
+					}else if(element_map[b2]->state_first_ending == -1){
+
+						wire_id++;	
+
+						element_map[b1]->state_second_ending = wire_id;
+						element_map[b2]->state_first_ending = wire_id;
+
+								temp_wire->wire.append(sf::Vertex(
+											sf::Vector2f( 
+												element_map[b1]->second_ending.getPosition().x + 5, 
+												element_map[b1]->second_ending.getPosition().y + 5), 
+										sf::Color::Red));
+								
+								temp_wire->wire.append(sf::Vertex(
+											sf::Vector2f( 
+												element_map[b1]->second_ending.getPosition().x + 5 , 
+												element_map[b1]->second_ending.getPosition().y + 5 - 60), 
+										sf::Color::Red));
+
+
+								temp_wire->wire.append(sf::Vertex(
+											sf::Vector2f( 
+												element_map[b2]->first_ending.getPosition().x + 5, 
+												element_map[b2]->first_ending.getPosition().y + 5 - 60), 
+										sf::Color::Green));
+
+
+								temp_wire->wire.append(sf::Vertex(
+											sf::Vector2f( 
+												element_map[b2]->first_ending.getPosition().x + 5, 
+												element_map[b2]->first_ending.getPosition().y + 5), 
+										sf::Color::Green));
+					}
+				}
+
+
+			}
+			}else{
+
+				if(element_map[b1]->state_first_ending == -1){
+
+					if(element_map[b2]->state_second_ending == -1){
+
+
+						wire_id++;	
+
+						element_map[b1]->state_first_ending = wire_id;
+						element_map[b2]->state_second_ending = wire_id;
+
+						temp_wire->wire.append(sf::Vertex(
+									sf::Vector2f( 
+										element_map[b1]->first_ending.getPosition().x + 5, 
+										element_map[b1]->first_ending.getPosition().y + 5), 
+								sf::Color::Red));
+
+						temp_wire->wire.append(sf::Vertex(
+									sf::Vector2f( 
+										(element_map[b1]->first_ending.getPosition().x + 5) - 
+											((element_map[b1]->first_ending.getPosition().x + 5) - 
+												(element_map[b2]->second_ending.getPosition().x + 5))/2, 
+
+										element_map[b1]->first_ending.getPosition().y + 5), 
+								sf::Color::Yellow));
+						
+						
+						temp_wire->wire.append(sf::Vertex(
+									sf::Vector2f( 
+										(element_map[b1]->first_ending.getPosition().x + 5) - 
+											((element_map[b1]->first_ending.getPosition().x + 5) - 
+												(element_map[b2]->second_ending.getPosition().x + 5))/2, 
+
+										element_map[b2]->second_ending.getPosition().y + 5), 
+								sf::Color::Yellow));
+
+
+						temp_wire->wire.append(sf::Vertex(
+									sf::Vector2f( 
+										element_map[b2]->second_ending.getPosition().x + 5, 
+										element_map[b2]->second_ending.getPosition().y + 5), 
+								sf::Color::Green));
+					}else if(element_map[b2]->state_first_ending == -1){
+
+						wire_id++;	
+
+						element_map[b1]->state_first_ending = wire_id;
+						element_map[b2]->state_first_ending = wire_id;
+
+						temp_wire->wire.append(sf::Vertex(
+									sf::Vector2f( 
+										element_map[b1]->first_ending.getPosition().x + 5, 
+										element_map[b1]->first_ending.getPosition().y + 5), 
+								sf::Color::Red));
+
+						
+						temp_wire->wire.append(sf::Vertex(
+									sf::Vector2f( 
+										(element_map[b1]->first_ending.getPosition().x + 5),
+
+										(element_map[b2]->second_ending.getPosition().y + 5) -  
+											( (element_map[b2]->second_ending.getPosition().y + 5) -
+											  (element_map[b1]->first_ending.getPosition().y + 5) )/2 ), 
+								sf::Color::Yellow));
+
+
+						temp_wire->wire.append(sf::Vertex(
+									sf::Vector2f( 	
+										(element_map[b2]->first_ending.getPosition().x + 5),
+
+										(element_map[b2]->second_ending.getPosition().y + 5) -  
+											( (element_map[b2]->second_ending.getPosition().y + 5) -
+											  (element_map[b1]->first_ending.getPosition().y + 5) )/2 ), 
+								sf::Color::Yellow));
+
+
+						temp_wire->wire.append(sf::Vertex(
+									sf::Vector2f( 
+										element_map[b2]->first_ending.getPosition().x + 5, 
+										element_map[b2]->first_ending.getPosition().y + 5), 
+								sf::Color::Green));
+					}
+				}else if(element_map[b1]->state_second_ending == -1){
+
+					if(element_map[b2]->state_second_ending == -1 ){
+
+						wire_id++;	
+
+						element_map[b1]->state_second_ending = wire_id;
+						element_map[b2]->state_second_ending = wire_id;
+
+						temp_wire->wire.append(sf::Vertex(
+									sf::Vector2f( 
+										element_map[b1]->second_ending.getPosition().x + 5, 
+										element_map[b1]->second_ending.getPosition().y + 5), 
+								sf::Color::Yellow));
+
+
+						temp_wire->wire.append(sf::Vertex(
+									sf::Vector2f( 
+										element_map[b1]->second_ending.getPosition().x + 5, 
+										element_map[b2]->second_ending.getPosition().y + 5), 
+								sf::Color::Yellow));
+
+
+						temp_wire->wire.append(sf::Vertex(
+									sf::Vector2f( 
+										element_map[b2]->second_ending.getPosition().x + 5, 
+										element_map[b2]->second_ending.getPosition().y + 5), 
+								sf::Color::Green));
+					}else if(element_map[b2]->state_first_ending == -1){
+
+						wire_id++;	
+
+						element_map[b1]->state_second_ending = wire_id;
+						element_map[b2]->state_first_ending = wire_id;
+
+						
+						temp_wire->wire.append(sf::Vertex(
+									sf::Vector2f( 
+										element_map[b1]->second_ending.getPosition().x + 5, 
+										element_map[b1]->second_ending.getPosition().y + 5), 
+								sf::Color::Red));
+
+						
+						temp_wire->wire.append(sf::Vertex(
+									sf::Vector2f( 
+										element_map[b1]->second_ending.getPosition().x + 5,
+
+										(element_map[b2]->first_ending.getPosition().y + 5) -  
+											( (element_map[b2]->first_ending.getPosition().y + 5) -
+											  (element_map[b1]->second_ending.getPosition().y + 5) )/2 ), 
+								sf::Color::Yellow));
+
+
+						temp_wire->wire.append(sf::Vertex(
+									sf::Vector2f( 	
+										(element_map[b2]->first_ending.getPosition().x + 5),
+
+										(element_map[b2]->first_ending.getPosition().y + 5) -  
+											( (element_map[b2]->first_ending.getPosition().y + 5) -
+											  (element_map[b1]->second_ending.getPosition().y + 5) )/2 ), 
+								sf::Color::Yellow));
+
+
+						temp_wire->wire.append(sf::Vertex(
+									sf::Vector2f( 
+										element_map[b2]->first_ending.getPosition().x + 5, 
+										element_map[b2]->first_ending.getPosition().y + 5), 
+								sf::Color::Green));
+					}
+				}
+
+			}
 	}else if(element_map[b1]->x == element_map[b2]->x){
 
-			temp_wire->wire.append(sf::Vertex(
-						sf::Vector2f( 
-							element_map[b1]->first_ending.getPosition().x + 5, 
-							element_map[b1]->first_ending.getPosition().y + 5), 
-					sf::Color::Red));
-
-			temp_wire->wire.append(sf::Vertex(
-						sf::Vector2f( 
-							element_map[b2]->first_ending.getPosition().x + 5, 
-							element_map[b2]->first_ending.getPosition().y + 5), 
-					sf::Color::Green));
-
-	}else{
 		if(element_map[b1]->y > element_map[b2]->y){
 
-			temp_wire->wire.append(sf::Vertex(
-						sf::Vector2f( 
-							element_map[b1]->second_ending.getPosition().x + 5, 
-							element_map[b1]->second_ending.getPosition().y + 5), 
-					sf::Color::Red));
+			if(element_map[b1]->state_first_ending == -1){
+				if(element_map[b2]->state_first_ending == -1){
+					wire_id++;	
+
+					element_map[b1]->state_first_ending = wire_id;
+					element_map[b2]->state_first_ending = wire_id;
+				
+
+					temp_wire->wire.append(sf::Vertex(
+							sf::Vector2f(
+								element_map[b1]->first_ending.getPosition().x + 5,
+								element_map[b1]->first_ending.getPosition().y + 5),
+						sf::Color::Red));
+
+					temp_wire->wire.append(sf::Vertex(
+								sf::Vector2f(
+									element_map[b2]->first_ending.getPosition().x + 5, 
+									element_map[b2]->first_ending.getPosition().y + 5), 
+							sf::Color::Green));
+
+				}else if(element_map[b2]->state_second_ending = -1){
+
+						wire_id++;	
+
+						element_map[b1]->state_first_ending = wire_id;
+						element_map[b2]->state_second_ending = wire_id;
+
+						temp_wire->wire.append(sf::Vertex(
+								sf::Vector2f(
+									element_map[b1]->first_ending.getPosition().x + 5,
+									element_map[b1]->first_ending.getPosition().y + 5),
+							sf::Color::Red));
+
+						
+						temp_wire->wire.append(sf::Vertex(
+									sf::Vector2f( 	
+										(element_map[b2]->first_ending.getPosition().x + 5),
+
+										(element_map[b2]->second_ending.getPosition().y + 5) -  
+											( (element_map[b2]->second_ending.getPosition().y + 5) -
+											  (element_map[b1]->first_ending.getPosition().y + 5) )/2 ), 
+								sf::Color::Yellow));
+
+						temp_wire->wire.append(sf::Vertex(
+									sf::Vector2f( 
+										(element_map[b1]->second_ending.getPosition().x + 5),
+
+										(element_map[b1]->second_ending.getPosition().y + 5) -  
+											( (element_map[b1]->second_ending.getPosition().y + 5) -
+											  (element_map[b2]->first_ending.getPosition().y + 5) )/2 ), 
+								sf::Color::Yellow));
 
 
-			
-			temp_wire->wire.append(sf::Vertex(
-						sf::Vector2f( 
-							(element_map[b1]->first_ending.getPosition().x + 5) - 
-								((element_map[b1]->first_ending.getPosition().x + 5) - 
-									(element_map[b2]->second_ending.getPosition().x + 5))/2, 
 
-							element_map[b1]->first_ending.getPosition().y + 5), 
-					sf::Color::Yellow));
-			
-			
-			temp_wire->wire.append(sf::Vertex(
-						sf::Vector2f( 
-							(element_map[b1]->first_ending.getPosition().x + 5) - 
-								((element_map[b1]->first_ending.getPosition().x + 5) - 
-									(element_map[b2]->second_ending.getPosition().x + 5))/2, 
+						temp_wire->wire.append(sf::Vertex(
+									sf::Vector2f(
+										element_map[b2]->second_ending.getPosition().x + 5, 
+										element_map[b2]->second_ending.getPosition().y + 5), 
+							sf::Color::Green));
 
-							element_map[b2]->second_ending.getPosition().y + 5), 
-					sf::Color::Yellow));
+					}
+				}else if(element_map[b1]->state_second_ending = -1){
+					if(element_map[b2]->state_first_ending == -1){
+						
+						wire_id++;
 
+						element_map[b1]->state_second_ending = wire_id;
+						element_map[b2]->state_first_ending = wire_id;
 
-			temp_wire->wire.append(sf::Vertex(
-						sf::Vector2f( 
-							element_map[b2]->first_ending.getPosition().x + 5, 
-							element_map[b2]->first_ending.getPosition().y + 5), 
-					sf::Color::Green));
+						temp_wire->wire.append(sf::Vertex(
+									sf::Vector2f( 
+										element_map[b1]->second_ending.getPosition().x + 5, 
+										element_map[b1]->first_ending.getPosition().y + 5), 
+								sf::Color::Red));
 
-		}else if(element_map[b1]->y == element_map[b2]->y){
+						
+						temp_wire->wire.append(sf::Vertex(
+									sf::Vector2f( 
+										(element_map[b1]->second_ending.getPosition().x + 5),
 
-			temp_wire->wire.append(sf::Vertex(
-						sf::Vector2f( 
-							element_map[b1]->second_ending.getPosition().x + 5, 
-							element_map[b1]->second_ending.getPosition().y + 5), 
-					sf::Color::Red));
+										(element_map[b1]->second_ending.getPosition().y + 5) -  
+											( (element_map[b1]->second_ending.getPosition().y + 5) -
+											  (element_map[b2]->first_ending.getPosition().y + 5) )/2 ), 
+								sf::Color::Yellow));
 
 
-			temp_wire->wire.append(sf::Vertex(
-						sf::Vector2f( 
-							element_map[b2]->first_ending.getPosition().x + 5, 
-							element_map[b2]->first_ending.getPosition().y + 5), 
-					sf::Color::Green));
-			
+						temp_wire->wire.append(sf::Vertex(
+									sf::Vector2f( 	
+										(element_map[b2]->first_ending.getPosition().x + 5),
+
+										(element_map[b1]->second_ending.getPosition().y + 5) -  
+											( (element_map[b1]->second_ending.getPosition().y + 5) -
+											  (element_map[b2]->first_ending.getPosition().y + 5) )/2 ), 
+								sf::Color::Yellow));
+
+
+						temp_wire->wire.append(sf::Vertex(
+									sf::Vector2f( 
+										element_map[b2]->first_ending.getPosition().x + 5, 
+										element_map[b2]->first_ending.getPosition().y + 5), 
+								sf::Color::Green));
+					}else if(element_map[b2]->state_second_ending == -1){
+
+					wire_id++;	
+
+					element_map[b1]->state_second_ending = wire_id;
+					element_map[b2]->state_second_ending = wire_id;
+				
+
+					temp_wire->wire.append(sf::Vertex(
+							sf::Vector2f(
+								element_map[b1]->second_ending.getPosition().x + 5,
+								element_map[b1]->second_ending.getPosition().y + 5),
+						sf::Color::Red));
+
+					temp_wire->wire.append(sf::Vertex(
+								sf::Vector2f(
+									element_map[b2]->second_ending.getPosition().x + 5, 
+									element_map[b2]->second_ending.getPosition().y + 5), 
+							sf::Color::Green));
+
+					 }
+				}
+			}
 		}else{
 
-			temp_wire->wire.append(sf::Vertex(
-						sf::Vector2f( 
-							element_map[b1]->second_ending.getPosition().x + 5, 
-							element_map[b1]->second_ending.getPosition().y + 5), 
-					sf::Color::Red));
+			if(element_map[b1]->y > element_map[b2]->y){
+		
+				if(element_map[b1]->state_second_ending == -1){
+
+					if(element_map[b2]->state_first_ending == -1){
+
+						wire_id++;
+
+						element_map[b1]->state_second_ending = wire_id;
+						element_map[b2]->state_first_ending = wire_id;
+
+						temp_wire->wire.append(sf::Vertex(
+								sf::Vector2f(
+									element_map[b1]->second_ending.getPosition().x + 5,
+									element_map[b1]->second_ending.getPosition().y + 5),
+							sf::Color::Red));
 
 
-			temp_wire->wire.append(sf::Vertex(
-						sf::Vector2f(
-							(element_map[b1]->first_ending.getPosition().x + 5) - 
-								((element_map[b1]->first_ending.getPosition().x + 5) - 
-								 	(element_map[b2]->second_ending.getPosition().x + 5))/2,
+						temp_wire->wire.append(sf::Vertex(
+									sf::Vector2f(
+										(element_map[b2]->first_ending.getPosition().x + 5) - 
+											((element_map[b2]->first_ending.getPosition().x + 5) - 
+												(element_map[b1]->second_ending.getPosition().x + 5))/2,
 
-						   	element_map[b1]->first_ending.getPosition().y + 5) ,
-					sf::Color::Magenta));
-
-
-			temp_wire->wire.append(sf::Vertex(
-						sf::Vector2f(
-							element_map[b1]->first_ending.getPosition().x + 5 - 
-								((element_map[b1]->first_ending.getPosition().x + 5) - 
-									(element_map[b2]->second_ending.getPosition().x + 5))/2,
-
-							element_map[b2]->second_ending.getPosition().y + 5),
-					sf::Color::Yellow));
+										element_map[b1]->second_ending.getPosition().y + 5) ,
+								sf::Color::Magenta));
 
 
-			temp_wire->wire.append(sf::Vertex(
-						sf::Vector2f( 
-							element_map[b2]->first_ending.getPosition().x + 5, 
-							element_map[b2]->first_ending.getPosition().y + 5), 
-					sf::Color::Green));
+						temp_wire->wire.append(sf::Vertex(
+									sf::Vector2f(
+										element_map[b2]->first_ending.getPosition().x + 5 - 
+											((element_map[b2]->first_ending.getPosition().x + 5) - 
+												(element_map[b1]->second_ending.getPosition().x + 5))/2,
 
+										element_map[b2]->first_ending.getPosition().y + 5),
+								sf::Color::Yellow));
+
+
+						temp_wire->wire.append(sf::Vertex(
+									sf::Vector2f(
+										element_map[b2]->first_ending.getPosition().x + 5, 
+										element_map[b2]->first_ending.getPosition().y + 5), 
+								sf::Color::Green));
+
+					}else if(element_map[b2]->state_second_ending == -1){
+						
+						wire_id++;
+			
+						element_map[b1]->state_second_ending = wire_id;
+						element_map[b2]->state_second_ending = wire_id;
+
+						temp_wire->wire.append(sf::Vertex(
+								sf::Vector2f(
+									element_map[b1]->second_ending.getPosition().x + 5,
+									element_map[b1]->second_ending.getPosition().y + 5),
+							sf::Color::Red));
+
+					
+						temp_wire->wire.append(sf::Vertex(
+									sf::Vector2f(
+										element_map[b2]->second_ending.getPosition().x + 5,
+										element_map[b1]->second_ending.getPosition().y + 5),
+								sf::Color::Yellow));
+
+
+						temp_wire->wire.append(sf::Vertex(
+									sf::Vector2f(
+										element_map[b2]->second_ending.getPosition().x + 5, 
+										element_map[b2]->second_ending.getPosition().y + 5), 
+								sf::Color::Green));
+					}
+
+
+				}else if(element_map[b1]->state_first_ending == -1){
+
+					if(element_map[b2]->state_first_ending == -1){
+
+						wire_id++;	
+
+						element_map[b1]->state_first_ending = wire_id;
+						element_map[b2]->state_first_ending = wire_id;
+
+						temp_wire->wire.append(sf::Vertex(
+								sf::Vector2f(
+									element_map[b1]->first_ending.getPosition().x + 5,
+									element_map[b1]->first_ending.getPosition().y + 5),
+							sf::Color::Red));
+
+
+						
+						temp_wire->wire.append(sf::Vertex(
+									sf::Vector2f( 
+										(element_map[b1]->first_ending.getPosition().x + 5),
+
+										(element_map[b1]->first_ending.getPosition().y + 5) -  
+											( (element_map[b1]->first_ending.getPosition().y + 5) -
+											  (element_map[b2]->first_ending.getPosition().y + 5) )/2 ), 
+								sf::Color::Yellow));
+
+
+						temp_wire->wire.append(sf::Vertex(
+									sf::Vector2f( 	
+										(element_map[b2]->first_ending.getPosition().x + 5),
+
+										(element_map[b1]->first_ending.getPosition().y + 5) -  
+											( (element_map[b1]->first_ending.getPosition().y + 5) -
+											  (element_map[b2]->first_ending.getPosition().y + 5) )/2 ), 
+								sf::Color::Magenta));
+
+
+						temp_wire->wire.append(sf::Vertex(
+									sf::Vector2f(
+										element_map[b2]->first_ending.getPosition().x + 5, 
+										element_map[b2]->first_ending.getPosition().y + 5), 
+								sf::Color::Green));
+
+					}else if(element_map[b2]->state_second_ending  == -1){
+						wire_id++;	
+
+						element_map[b1]->state_first_ending = wire_id;
+						element_map[b2]->state_second_ending = wire_id;
+					
+
+						temp_wire->wire.append(sf::Vertex(
+								sf::Vector2f(
+									element_map[b1]->first_ending.getPosition().x + 5,
+									element_map[b1]->second_ending.getPosition().y + 5),
+							sf::Color::Red));
+
+
+						temp_wire->wire.append(sf::Vertex(
+									sf::Vector2f(
+										element_map[b1]->first_ending.getPosition().x + 5,
+
+										(element_map[b1]->first_ending.getPosition().y + 5) - 
+											( (  element_map[b1]->first_ending.getPosition().y + 5)  - 
+												( element_map[b2]->second_ending.getPosition().y + 5) )/2 ) ,
+								sf::Color::Magenta));
+
+
+						temp_wire->wire.append(sf::Vertex(
+									sf::Vector2f(
+										element_map[b2]->second_ending.getPosition().x + 5,	
+
+										(element_map[b1]->first_ending.getPosition().y + 5) - 
+											( (  element_map[b1]->first_ending.getPosition().y + 5)  - 
+												( element_map[b2]->second_ending.getPosition().y + 5) )/2 ) ,
+								sf::Color::Yellow));
+
+
+						temp_wire->wire.append(sf::Vertex(
+									sf::Vector2f(
+										element_map[b2]->second_ending.getPosition().x + 5, 
+										element_map[b2]->second_ending.getPosition().y + 5), 
+								sf::Color::Green));
+					}
+
+				}	
+					
+			}else if(element_map[b1]->y == element_map[b2]->y){		
+				if(element_map[b1]->x > element_map[b2]->x){
+					if(element_map[b1]->state_second_ending == -1){
+								if(element_map[b2]->state_first_ending == -1){
+
+									wire_id++;	
+
+									element_map[b1]->state_second_ending = wire_id;
+									element_map[b2]->state_first_ending = wire_id;
+
+									temp_wire->wire.append(sf::Vertex(
+												sf::Vector2f( 
+													element_map[b1]->second_ending.getPosition().x + 5, 
+													element_map[b1]->second_ending.getPosition().y + 5), 
+											sf::Color::Red));
+
+
+									temp_wire->wire.append(sf::Vertex(
+												sf::Vector2f( 
+													element_map[b2]->first_ending.getPosition().x + 5, 
+													element_map[b2]->first_ending.getPosition().y + 5), 
+											sf::Color::Green));
+
+								}else if(element_map[b2]->state_second_ending == -1){
+
+									wire_id++;	
+
+									element_map[b1]->state_second_ending = wire_id;
+									element_map[b2]->state_second_ending = wire_id;
+
+									temp_wire->wire.append(sf::Vertex(
+												sf::Vector2f( 
+													element_map[b1]->second_ending.getPosition().x + 5, 
+													element_map[b1]->second_ending.getPosition().y + 5), 
+											sf::Color::Red));
+									
+									temp_wire->wire.append(sf::Vertex(
+												sf::Vector2f( 
+													element_map[b1]->second_ending.getPosition().x + 5 , 
+													element_map[b1]->second_ending.getPosition().y + 5 - 30), 
+											sf::Color::Red));
+
+
+									temp_wire->wire.append(sf::Vertex(
+												sf::Vector2f( 
+													element_map[b2]->second_ending.getPosition().x + 5, 
+													element_map[b2]->second_ending.getPosition().y + 5 - 30), 
+											sf::Color::Green));
+
+
+									temp_wire->wire.append(sf::Vertex(
+												sf::Vector2f( 
+													element_map[b2]->second_ending.getPosition().x + 5, 
+													element_map[b2]->second_ending.getPosition().y + 5), 
+											sf::Color::Green));
+								}
+					}else if(element_map[b1]->state_second_ending == -1){
+						if(element_map[b2]->state_first_ending == -1){
+
+							wire_id++;	
+
+							element_map[b1]->state_second_ending = wire_id;
+							element_map[b2]->state_first_ending = wire_id;
+
+									temp_wire->wire.append(sf::Vertex(
+												sf::Vector2f( 
+													element_map[b1]->second_ending.getPosition().x + 5, 
+													element_map[b1]->second_ending.getPosition().y + 5), 
+											sf::Color::Red));
+									
+									temp_wire->wire.append(sf::Vertex(
+												sf::Vector2f( 
+													element_map[b1]->second_ending.getPosition().x + 5 , 
+													element_map[b1]->second_ending.getPosition().y + 5 - 60), 
+											sf::Color::Red));
+
+
+									temp_wire->wire.append(sf::Vertex(
+												sf::Vector2f( 
+													element_map[b2]->first_ending.getPosition().x + 5, 
+													element_map[b2]->first_ending.getPosition().y + 5 - 60), 
+											sf::Color::Green));
+
+
+									temp_wire->wire.append(sf::Vertex(
+												sf::Vector2f( 
+													element_map[b2]->first_ending.getPosition().x + 5, 
+													element_map[b2]->first_ending.getPosition().y + 5), 
+											sf::Color::Green));
+						}else if(element_map[b2]->state_second_ending == -1){
+
+							wire_id++;	
+
+							element_map[b1]->state_second_ending = wire_id;
+							element_map[b2]->state_second_ending = wire_id;
+
+									temp_wire->wire.append(sf::Vertex(
+												sf::Vector2f( 
+													element_map[b1]->second_ending.getPosition().x + 5, 
+													element_map[b1]->second_ending.getPosition().y + 5), 
+											sf::Color::Red));
+									
+									temp_wire->wire.append(sf::Vertex(
+												sf::Vector2f( 
+													element_map[b1]->second_ending.getPosition().x + 5 , 
+													element_map[b1]->second_ending.getPosition().y + 5 - 60), 
+											sf::Color::Red));
+
+
+									temp_wire->wire.append(sf::Vertex(
+												sf::Vector2f( 
+													element_map[b2]->second_ending.getPosition().x + 5, 
+													element_map[b2]->second_ending.getPosition().y + 5 - 60), 
+											sf::Color::Green));
+
+
+									temp_wire->wire.append(sf::Vertex(
+												sf::Vector2f( 
+													element_map[b2]->second_ending.getPosition().x + 5, 
+													element_map[b2]->second_ending.getPosition().y + 5), 
+											sf::Color::Green));
+						}
+					}
+
+
+				}
+				}else{
+
+					if(element_map[b1]->state_second_ending == -1){
+
+						if(element_map[b2]->state_first_ending == -1){
+
+
+							wire_id++;	
+
+							element_map[b1]->state_second_ending = wire_id;
+							element_map[b2]->state_first_ending = wire_id;
+
+							temp_wire->wire.append(sf::Vertex(
+										sf::Vector2f( 
+											element_map[b1]->second_ending.getPosition().x + 5, 
+											element_map[b1]->first_ending.getPosition().y + 5), 
+									sf::Color::Red));
+
+							temp_wire->wire.append(sf::Vertex(
+										sf::Vector2f( 
+											(element_map[b2]->first_ending.getPosition().x + 5) - 
+												((element_map[b2]->first_ending.getPosition().x + 5) - 
+													(element_map[b1]->second_ending.getPosition().x + 5))/2, 
+
+											element_map[b1]->second_ending.getPosition().y + 5), 
+									sf::Color::Yellow));
+							
+							
+							temp_wire->wire.append(sf::Vertex(
+										sf::Vector2f( 
+											(element_map[b2]->first_ending.getPosition().x + 5) - 
+												((element_map[b2]->first_ending.getPosition().x + 5) - 
+													(element_map[b1]->second_ending.getPosition().x + 5))/2, 
+
+											element_map[b2]->first_ending.getPosition().y + 5), 
+									sf::Color::Yellow));
+
+
+							temp_wire->wire.append(sf::Vertex(
+										sf::Vector2f( 
+											element_map[b2]->first_ending.getPosition().x + 5, 
+											element_map[b2]->first_ending.getPosition().y + 5), 
+									sf::Color::Green));
+						}else if(element_map[b2]->state_second_ending == -1){
+
+							wire_id++;	
+
+							element_map[b1]->state_second_ending = wire_id;
+							element_map[b2]->state_second_ending = wire_id;
+
+							temp_wire->wire.append(sf::Vertex(
+										sf::Vector2f( 
+											element_map[b1]->second_ending.getPosition().x + 5, 
+											element_map[b1]->second_ending.getPosition().y + 5), 
+									sf::Color::Red));
+
+							
+							temp_wire->wire.append(sf::Vertex(
+										sf::Vector2f( 
+											element_map[b2]->second_ending.getPosition().x + 5,
+											element_map[b1]->second_ending.getPosition().y + 5),  
+									sf::Color::Yellow));
+
+
+
+							temp_wire->wire.append(sf::Vertex(
+										sf::Vector2f( 
+											element_map[b2]->second_ending.getPosition().x + 5, 
+											element_map[b2]->second_ending.getPosition().y + 5), 
+									sf::Color::Green));
+						}
+					}else if(element_map[b1]->state_first_ending == -1){
+
+						if(element_map[b2]->state_first_ending == -1 ){
+
+							wire_id++;	
+
+							element_map[b1]->state_first_ending = wire_id;
+							element_map[b2]->state_first_ending = wire_id;
+
+							temp_wire->wire.append(sf::Vertex(
+										sf::Vector2f( 
+											element_map[b1]->first_ending.getPosition().x + 5, 
+											element_map[b1]->first_ending.getPosition().y + 5), 
+									sf::Color::Yellow));
+
+
+							temp_wire->wire.append(sf::Vertex(
+										sf::Vector2f( 
+											element_map[b1]->first_ending.getPosition().x + 5, 
+											element_map[b2]->first_ending.getPosition().y + 5), 
+									sf::Color::Yellow));
+
+
+							temp_wire->wire.append(sf::Vertex(
+										sf::Vector2f( 
+											element_map[b2]->first_ending.getPosition().x + 5, 
+											element_map[b2]->first_ending.getPosition().y + 5), 
+									sf::Color::Green));
+						}else if(element_map[b2]->state_second_ending == -1){
+
+							wire_id++;	
+
+							element_map[b1]->state_first_ending = wire_id;
+							element_map[b2]->state_second_ending = wire_id;
+
+							
+							temp_wire->wire.append(sf::Vertex(
+										sf::Vector2f( 
+											element_map[b1]->first_ending.getPosition().x + 5, 
+											element_map[b1]->first_ending.getPosition().y + 5), 
+									sf::Color::Red));
+
+							
+							temp_wire->wire.append(sf::Vertex(
+										sf::Vector2f( 
+											element_map[b1]->first_ending.getPosition().x + 5,
+
+											(element_map[b2]->second_ending.getPosition().y + 5) -  
+												( (element_map[b2]->second_ending.getPosition().y + 5) -
+												  (element_map[b1]->first_ending.getPosition().y + 5) )/2 ), 
+									sf::Color::Yellow));
+
+
+							temp_wire->wire.append(sf::Vertex(
+										sf::Vector2f( 	
+											(element_map[b2]->second_ending.getPosition().x + 5),
+
+											(element_map[b2]->second_ending.getPosition().y + 5) -  
+												( (element_map[b2]->second_ending.getPosition().y + 5) -
+												  (element_map[b1]->first_ending.getPosition().y + 5) )/2 ), 
+									sf::Color::Yellow));
+
+
+							temp_wire->wire.append(sf::Vertex(
+										sf::Vector2f( 
+											element_map[b2]->second_ending.getPosition().x + 5, 
+											element_map[b2]->second_ending.getPosition().y + 5), 
+									sf::Color::Green));
+						}
+					}
+
+				}
 		}
-	}
+		
+
 
 	temp_wire->wire.setPrimitiveType ( sf::LinesStrip ) ;
 	vector_draw_wire.push_back(&temp_wire->wire);
 
 	std::cout<< "New wire: "<< b1 << ", " << b2 << "\n\n";
-	std::cout<< "Amount id: " << element_id <<"\n\n";
+	std::cout<< "Amount wire: " << wire_id <<"\n\n";
 
 	bufferFirstElement = -1;
 	bufferSecondElement = -1;
