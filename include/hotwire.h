@@ -36,6 +36,8 @@ class Hotwire{
 		sfg::Window::Ptr sfgui_window_menu = sfg::Window::Create();
 		sfg::Window::Ptr sfgui_window_pause = sfg::Window::Create();
 		sfg::Window::Ptr sfgui_window_bar = sfg::Window::Create(sfg::Window::Style::TITLEBAR | sfg::Window::Style::BACKGROUND);
+
+		sf::Vector2f pos_bar;
 		
 		std::map<std::string, sfg::Image::Ptr> image_map;
 
