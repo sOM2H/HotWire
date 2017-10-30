@@ -39,6 +39,7 @@ class Hotwire{
 
 		sf::Vector2f pos_bar;
 		
+
 		std::map<std::string, sfg::Image::Ptr> image_map;
 
 		sfg::Fixed::Ptr fixed = sfg::Fixed::Create();
@@ -51,11 +52,15 @@ class Hotwire{
 		std::vector<std::pair<int, int> > vector_wires;
 		sf::VertexArray wires;
 		std::vector<sf::VertexArray *> vector_draw_wire;
-		std::vector<sf::CircleShape *> vector_draw_circleshape;
+		//std::vector<sf::CircleShape *> vector_draw_circleshape;
 
 		std::string buffer = "empty";
+
 		int bufferFirstElement = -1;
 		int bufferSecondElement = -1;
+
+		int index_F_E_B = -1;
+		int index_S_E_B = -1;
 
 		bool render_bar = false;
         bool running = false;
@@ -70,7 +75,7 @@ class Hotwire{
 		int element_id = 0;
 
 		int element_making(std::string name, sf::Vector2i pos, int amountOfBatteries, int &id);
-		int wire_making(int b1, int b2);
+		int wire_making(int b1, int b2, int I_F_E_B, int I_S_E_B);
 
         void init();
         void handle_events();

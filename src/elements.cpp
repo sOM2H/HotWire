@@ -6,31 +6,29 @@ void Lamp::setImage(){
 		printf("Init new image: lamp.png\n\n");
 	}
 	image->SetImage(img);
+}
 
-	first_ending.setRadius(5.f);
-	first_ending.setFillColor(sf::Color::White);
-
-	second_ending.setRadius(5.f);
-	second_ending.setFillColor(sf::Color::White);
-
-	first_ending.setPosition(sf::Vector2f(-1, -1)); second_ending.setPosition(sf::Vector2f(-1, -1));
-
+void Lamp::init_endings(){
+	
+	vector_endings.push_back(ending("left"));
+	vector_endings.push_back(ending("right"));
 
 }
+
+
 
 void Battery::setImage(){
 	if(img.loadFromFile( "src/textures/battery.png" )){
 		printf("Init new image: battery.png\n\n");
 	}
 	image->SetImage(img);
+}
 
-	first_ending.setRadius(5.f);
-	first_ending.setFillColor(sf::Color::White);
+void Battery::init_endings(){
+	
+	vector_endings.push_back(ending("left"));
+	vector_endings.push_back(ending("right"));
 
-	second_ending.setRadius(5.f);
-	second_ending.setFillColor(sf::Color::White);
-
-	first_ending.setPosition(sf::Vector2f(-1, -1)); second_ending.setPosition(sf::Vector2f(-1, -1));
 }
 
 void Resistor::setImage(){
@@ -38,14 +36,13 @@ void Resistor::setImage(){
 		printf("Init new image: resistor.png\n\n");
 	}
 	image->SetImage(img);
+}
 
-	first_ending.setRadius(5.f);
-	first_ending.setFillColor(sf::Color::White);
+void Resistor::init_endings(){
 
-	second_ending.setRadius(5.f);
-	second_ending.setFillColor(sf::Color::White);
+	vector_endings.push_back(ending("left"));
+	vector_endings.push_back(ending("right"));
 
-	first_ending.setPosition(sf::Vector2f(-1, -1)); second_ending.setPosition(sf::Vector2f(-1, -1));
 }
 
 
@@ -54,14 +51,12 @@ void Ampermeter::setImage(){
 		printf("Init new image: ampermeter.png\n\n");
 	}
 	image->SetImage(img);
+}
 
-	first_ending.setRadius(5.f);
-	first_ending.setFillColor(sf::Color::White);
+void Ampermeter::init_endings(){
 
-	second_ending.setRadius(5.f);
-	second_ending.setFillColor(sf::Color::White);
-
-	first_ending.setPosition(sf::Vector2f(-1, -1)); second_ending.setPosition(sf::Vector2f(-1, -1));
+	vector_endings.push_back(ending("left"));
+	vector_endings.push_back(ending("right"));
 }
 
 void Voltmeter::setImage(){
@@ -69,14 +64,12 @@ void Voltmeter::setImage(){
 		printf("Init new image: voltmeter.png\n\n");
 	}
 	image->SetImage(img);
+}
 
-	first_ending.setRadius(5.f);
-	first_ending.setFillColor(sf::Color::White);
+void Voltmeter::init_endings(){
 
-	second_ending.setRadius(5.f);
-	second_ending.setFillColor(sf::Color::White);
-
-	first_ending.setPosition(sf::Vector2f(-1, -1)); second_ending.setPosition(sf::Vector2f(-1, -1));
+	vector_endings.push_back(ending("left"));
+	vector_endings.push_back(ending("right"));
 }
 
 void Bell::setImage(){
@@ -84,15 +77,12 @@ void Bell::setImage(){
 		printf("Init new image: bell.png\n\n");
 	}
 	image->SetImage(img);
+}
 
-	first_ending.setRadius(5.f);
-	first_ending.setFillColor(sf::Color::White);
-
-	second_ending.setRadius(5.f);
-	second_ending.setFillColor(sf::Color::White);
-
-	first_ending.setPosition(sf::Vector2f(-1, -1)); 
-	second_ending.setPosition(sf::Vector2f(-1, -1));
+void Bell::init_endings()
+{
+	vector_endings.push_back(ending("left"));
+	vector_endings.push_back(ending("right"));
 }
 
 void Coil::setImage(){
@@ -100,15 +90,12 @@ void Coil::setImage(){
 		printf("Init new image: coil.png\n\n");
 	}
 	image->SetImage(img);
+}
 
-	first_ending.setRadius(5.f);
-	first_ending.setFillColor(sf::Color::White);
+void Coil::init_endings(){ 
 
-	second_ending.setRadius(5.f);
-	second_ending.setFillColor(sf::Color::White);
-
-	first_ending.setPosition(sf::Vector2f(-1, -1)); 
-	second_ending.setPosition(sf::Vector2f(-1, -1));
+	vector_endings.push_back(ending("left"));
+	vector_endings.push_back(ending("right"));
 }
 
 
@@ -118,15 +105,14 @@ void Transistor::setImage(){
 		printf("Init new image: transistor.png\n\n");
 	}
 	image->SetImage(img);
+}
 
-	first_ending.setRadius(5.f);
-	first_ending.setFillColor(sf::Color::White);
+void Transistor::init_endings(){
+	
+	vector_endings.push_back(ending("left"));
+	vector_endings.push_back(ending("right"));
+	vector_endings.push_back(ending("down"));
 
-	second_ending.setRadius(5.f);
-	second_ending.setFillColor(sf::Color::White);
-
-	first_ending.setPosition(sf::Vector2f(-1, -1)); 
-	second_ending.setPosition(sf::Vector2f(-1, -1));
 }
 
 void Switch::setImage(){
@@ -134,15 +120,12 @@ void Switch::setImage(){
 		printf("Init new image: switch.png\n\n");
 	}
 	image->SetImage(img);
+}
 
-	first_ending.setRadius(5.f);
-	first_ending.setFillColor(sf::Color::White);
+void Switch::init_endings(){
 
-	second_ending.setRadius(5.f);
-	second_ending.setFillColor(sf::Color::White);
-
-	first_ending.setPosition(sf::Vector2f(-1, -1)); 
-	second_ending.setPosition(sf::Vector2f(-1, -1));
+	vector_endings.push_back(ending("left"));
+	vector_endings.push_back(ending("right"));
 }
 
 void Lamp::draw(){

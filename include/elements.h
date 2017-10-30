@@ -12,13 +12,29 @@ public:
 	int id;
 	virtual void draw() = 0;
 	virtual std::string getType() = 0;
-	sf::CircleShape first_ending;
-	sf::CircleShape second_ending;
-	int state_first_ending = -1;
-	int state_second_ending = -1;
+
+	struct ending{
+		int other_element_id = -1;
+		std::string lay = "none";
+		sfg::Button::Ptr ending_button = sfg::Button::Create();
+
+		ending(std::string lay = "none", int id = -1)
+			: lay(lay)
+			, other_element_id(id) {
+				sfg::Image::Ptr sfg_image = sfg::Image::Create(texture_manager->sfml_image_map["loles"]);
+				//ending_button->SetSpacing(0.f);
+				ending_button->SetImage(sfg_image);
+			}
+
+
+	};
+	
+	std::vector<ending> vector_endings;
+
 	sf::Image img;
 	sfg::Image::Ptr image = sfg::Image::Create();
 	virtual void setImage() = 0;
+	virtual void init_endings() = 0;
 };
 
 class Wire{
@@ -35,7 +51,8 @@ public:
     float resistance = 0;
     void draw();	
 	void setImage();
-	std::string getType();
+	std::string getType();	
+	void init_endings();
 };
 
 class Resistor : public Element{
@@ -46,6 +63,7 @@ public:
     void draw();
 	void setImage();
 	std::string getType();
+	void init_endings();
 };
 
 class Battery : public Element{
@@ -55,6 +73,7 @@ public:
     void draw();
 	void setImage();
 	std::string getType();
+	void init_endings();
 };
 
 class Knot : public Element{
@@ -73,6 +92,7 @@ public:
     void draw();
 	void setImage();
 	std::string getType();
+	void init_endings();
 };
 
 class Voltmeter : public Element{
@@ -82,6 +102,7 @@ public:
     void draw();
 	void setImage();
 	std::string getType();
+	void init_endings();
 };
 
 class Bell : public Element{
@@ -92,6 +113,7 @@ public:
     void draw();
 	void setImage();
 	std::string getType();
+	void init_endings();
 };
 
 
@@ -103,6 +125,7 @@ public:
     void draw();
 	void setImage();
 	std::string getType();
+	void init_endings();
 };
 
 
@@ -114,6 +137,7 @@ public:
     void draw();
 	void setImage();
 	std::string getType();
+	void init_endings();
 };
 
 class Switch : public Element{
@@ -124,6 +148,7 @@ public:
     void draw();
 	void setImage();
 	std::string getType();
+	void init_endings();
 };
 
 #endif
