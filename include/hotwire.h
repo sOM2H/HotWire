@@ -62,7 +62,6 @@ class Hotwire{
 		int index_F_E_B = -1;
 		int index_S_E_B = -1;
 
-	//	bool render_bar = false;
         bool running = false;
 
 		int amountImageX;

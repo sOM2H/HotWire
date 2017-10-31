@@ -217,8 +217,6 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 		temp->option_window_box->Pack(temp->option_window_ok_box, false, false);
 		temp->option_window->Add(temp->option_window_box);
 
-		
-
 	}else if(name == "battery"){
 
 		amountOfBatteries++;
