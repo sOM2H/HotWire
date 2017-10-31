@@ -495,7 +495,7 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 	fixed->Put( canvas, sf::Vector2f(0, 0));
 	desktop.BringToFront(sfgui_window_bar);
 	//std::cout<< fixed->GetAllocation() << "\n\n";
-
+/*
 		temp->indicator_label->SetText("Indicator: ");
 
 		temp->indicator_box->Pack(temp->indicator_label);
@@ -513,7 +513,7 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 
 		temp->option_window_ok_box->Pack(temp->option_window_ok);
 		temp->option_window_box->Pack(temp->option_window_ok_box, false, false);
-		temp->option_window->Add(temp->option_window_box);
+		temp->option_window->Add(temp->option_window_box);*/
 }
 
 int Hotwire::wire_making(int b1, int b2, int I_F_E_B, int I_S_E_B){
