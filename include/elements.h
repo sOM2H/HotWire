@@ -35,6 +35,8 @@ public:
 	sfg::Window::Ptr option_window = sfg::Window::Create( sfg::Window::Style::TITLEBAR | sfg::Window::Style::BACKGROUND | sfg::Window::Style::CLOSE);
 	bool state_render_option_window = false;
 	sfg::Box::Ptr option_window_box = sfg::Box::Create(sfg::Box::Orientation::VERTICAL);
+	sfg::Button::Ptr option_window_ok = sfg::Button::Create();
+	sfg::Box::Ptr option_window_ok_box = sfg::Box::Create();
 	sfg::Box::Ptr resistance_box = sfg::Box::Create();
 	sfg::Entry::Ptr resistance_entry = sfg::Entry::Create();
 	sfg::Label::Ptr resistance_label = sfg::Label::Create();
