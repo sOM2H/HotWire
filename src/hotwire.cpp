@@ -329,11 +329,12 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 	temp->option_window->SetPosition(sf::Vector2f(temp->x + 30, temp->y + 30));
 
 	bool & state_r_o_w_ref = temp->state_render_option_window;
-	//auto & temp_o_w = temp->option_window;
 
 	desktop.Add(element_map[id]->option_window);
 	temp->image->GetSignal(sfg::Image::OnMouseRightPress).Connect([&, id]{
 				desktop.BringToFront(element_map[id]->option_window);
+				element_map[id]->option_window->SetPosition(sf::Vector2f(element_map[id]->x + 30, element_map[id]->y + 30));
+
 		});
 
 //	desktop.Add(temp->option_window);
