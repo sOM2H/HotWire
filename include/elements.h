@@ -27,19 +27,41 @@ public:
 
 
 	};
+
+	struct knot{
+		std::string lay = "eny";
+		sfg::Button::Ptr ending_button = sfg::Button::Create();
+		knot(){
+			sfg::Image::Ptr sfg_image = sfg::Image::Create(texture_manager->sfml_image_map["dot"]);
+			ending_button->SetImage(sfg_image);
+		};
+	};
 	
 	std::vector<ending> vector_endings;
+
+	knot dot;
 
 	sf::Image img;
 	sfg::Image::Ptr image = sfg::Image::Create();
 	sfg::Window::Ptr option_window = sfg::Window::Create( sfg::Window::Style::TITLEBAR | sfg::Window::Style::BACKGROUND | sfg::Window::Style::CLOSE);
-	bool state_render_option_window = false;
+
 	sfg::Box::Ptr option_window_box = sfg::Box::Create(sfg::Box::Orientation::VERTICAL);
 	sfg::Button::Ptr option_window_ok = sfg::Button::Create();
+
 	sfg::Box::Ptr option_window_ok_box = sfg::Box::Create();
+
 	sfg::Box::Ptr resistance_box = sfg::Box::Create();
+	sfg::Box::Ptr voltage_box = sfg::Box::Create();
+	sfg::Box::Ptr indicator_box = sfg::Box::Create();
+
 	sfg::Entry::Ptr resistance_entry = sfg::Entry::Create();
 	sfg::Label::Ptr resistance_label = sfg::Label::Create();
+	
+	sfg::Entry::Ptr voltage_entry = sfg::Entry::Create();
+	sfg::Label::Ptr voltage_label = sfg::Label::Create();
+
+	sfg::Label::Ptr indicator_label = sfg::Label::Create();
+
 	virtual void setImage() = 0;
 	virtual void init_endings() = 0;
 };
@@ -78,7 +100,7 @@ public:
 	Battery(){}
 	~Battery();
     void draw();
-
+	float voltage = 0;
 	void setImage();
 	std::string getType();
 	void init_endings();
@@ -100,6 +122,7 @@ public:
     void draw();
 	void setImage();
 	std::string getType();
+	float indicator = 0;
 	void init_endings();
 };
 
@@ -110,6 +133,7 @@ public:
     void draw();
 	void setImage();
 	std::string getType();
+	float indicator = 0;
 	void init_endings();
 };
 

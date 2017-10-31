@@ -3,6 +3,7 @@
 #include <SFGUI/Widgets.hpp>
 #include <SFGUI/FileResourceLoader.hpp>
 #include <iostream>
+#include <algorithm>
 
 Hotwire::Hotwire()
 	/*: render_window(sf::VideoMode(800, 600), "HotWire", 5)*/
@@ -43,7 +44,6 @@ void Hotwire::init(){
     for (const std::string & name : images) {
 		init_image(name);
     }
-
 
     image_map["lamp"]->GetSignal(sfg::Image::OnMouseLeftPress).Connect([&buffer_ref]{buffer_ref = "lamp"; std::cout << "buffer: lamp\n";});
     image_map["battery"]->GetSignal(sfg::Image::OnMouseLeftPress).Connect([&buffer_ref]{buffer_ref = "battery"; std::cout << "buffer: battery\n";});
@@ -210,7 +210,9 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 		auto & resistance_entry_ref = temp->resistance_entry;
 
 		temp->option_window_ok->GetSignal(sfg::Widget::OnLeftClick ).Connect([&]{
-				resistance_entry_ref->SetText(regex_string(resistance_entry_ref->GetText()));
+				resistance_entry_ref->SetText(regex_string(resistance_entry_ref->GetText()));	
+				desktop.BringToFront(sfgui_window);
+				desktop.BringToFront(sfgui_window_bar);
 		});
 
 		temp->option_window_ok_box->Pack(temp->option_window_ok);
@@ -221,73 +223,183 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 
 		amountOfBatteries++;
 		temp = new Battery;
+
+		temp->voltage_label->SetText("Voltage");
+
+		temp->voltage_label->SetRequisition(sf::Vector2f(100, 20));
+
+		temp->voltage_entry->SetRequisition(sf::Vector2f(200, 20));	
+
+		temp->voltage_box->Pack(temp->voltage_label);
+		temp->voltage_box->Pack(temp->voltage_entry);
+
+		temp->option_window_box->Pack(temp->voltage_box, false, false);
+		
 		temp->option_window->SetTitle("Option window: Battery");
+
+		temp->option_window_ok->SetLabel("Apply");
+
+		temp->option_window_ok->SetRequisition(sf::Vector2f(300, 30));
+
+		auto & voltage_entry_ref = temp->voltage_entry;
+
+		temp->option_window_ok->GetSignal(sfg::Widget::OnLeftClick ).Connect([&]{
+				voltage_entry_ref->SetText(regex_string(voltage_entry_ref->GetText()));	
+				desktop.BringToFront(sfgui_window);
+				desktop.BringToFront(sfgui_window_bar);
+		});
+
+		temp->option_window_ok_box->Pack(temp->option_window_ok);
+		temp->option_window_box->Pack(temp->option_window_ok_box, false, false);
+		temp->option_window->Add(temp->option_window_box);
+
 
 	} else if(name == "resistor"){
 		temp = new Resistor;
-		temp->option_window->SetTitle("Option window: Resistor");
 
 		temp->resistance_label->SetText("Resistance");
+
 		temp->resistance_label->SetRequisition(sf::Vector2f(100, 20));
 
-		temp->resistance_entry->SetRequisition(sf::Vector2f(200, 20));
-		//temp->resistanse_entry->SetText();
-	
+		temp->resistance_entry->SetRequisition(sf::Vector2f(200, 20));	
 
 		temp->resistance_box->Pack(temp->resistance_label);
 		temp->resistance_box->Pack(temp->resistance_entry);
 
 		temp->option_window_box->Pack(temp->resistance_box, false, false);
 
-				temp->option_window->Add(temp->option_window_box);
+		temp->option_window->SetTitle("Option window: Resistor");
+
+		temp->option_window_ok->SetLabel("Apply");
+
+		temp->option_window_ok->SetRequisition(sf::Vector2f(300, 30));
+
+		auto & resistance_entry_ref = temp->resistance_entry;
+
+		temp->option_window_ok->GetSignal(sfg::Widget::OnLeftClick ).Connect([&]{
+				resistance_entry_ref->SetText(regex_string(resistance_entry_ref->GetText()));	
+				desktop.BringToFront(sfgui_window);
+				desktop.BringToFront(sfgui_window_bar);
+		});
+
+		temp->option_window_ok_box->Pack(temp->option_window_ok);
+		temp->option_window_box->Pack(temp->option_window_ok_box, false, false);
+		temp->option_window->Add(temp->option_window_box);
+
+
 
 	} else if(name == "ampermeter"){
 
 		temp = new Ampermeter;
 		temp->option_window->SetTitle("Option window: Ampeter");
 
+		temp->indicator_label->SetText("Indicator: ");
+
+		temp->indicator_box->Pack(temp->indicator_label);
+
+		temp->option_window_box->Pack(temp->indicator_box, false, false);
+
+		temp->option_window_ok->SetLabel("Okay");
+
+		temp->option_window_ok->GetSignal(sfg::Widget::OnLeftClick).Connect([&]{
+				desktop.BringToFront(sfgui_window);
+				desktop.BringToFront(sfgui_window_bar);
+				});
+
+		temp->option_window_box->SetSpacing(5.f);
+
+		temp->option_window_ok_box->Pack(temp->option_window_ok);
+		temp->option_window_box->Pack(temp->option_window_ok_box, false, false);
+		temp->option_window->Add(temp->option_window_box);
+
+
 	} else if(name == "voltmeter"){
 
 		temp = new Voltmeter;
 		temp->option_window->SetTitle("Option window: Voltmeter");
 
+		temp->indicator_label->SetText("Indicator: ");
+
+		temp->indicator_box->Pack(temp->indicator_label);
+
+		temp->option_window_box->Pack(temp->indicator_box, false, false);
+
+		temp->option_window_ok->SetLabel("Okay");
+
+		temp->option_window_ok->GetSignal(sfg::Widget::OnLeftClick).Connect([&]{
+				desktop.BringToFront(sfgui_window);
+				desktop.BringToFront(sfgui_window_bar);
+				});
+
+		temp->option_window_box->SetSpacing(5.f);
+
+		temp->option_window_ok_box->Pack(temp->option_window_ok);
+		temp->option_window_box->Pack(temp->option_window_ok_box, false, false);
+		temp->option_window->Add(temp->option_window_box);
+
+
 	} else if(name == "bell"){
 
 		temp = new Bell;
-		temp->option_window->SetTitle("Option window: Bell");
-
 		temp->resistance_label->SetText("Resistance");
+
 		temp->resistance_label->SetRequisition(sf::Vector2f(100, 20));
 
-		temp->resistance_entry->SetRequisition(sf::Vector2f(200, 20));
-		//temp->resistanse_entry->SetText();
-	
+		temp->resistance_entry->SetRequisition(sf::Vector2f(200, 20));	
 
 		temp->resistance_box->Pack(temp->resistance_label);
 		temp->resistance_box->Pack(temp->resistance_entry);
 
 		temp->option_window_box->Pack(temp->resistance_box, false, false);
 
+		temp->option_window->SetTitle("Option window: Bell");
+
+		temp->option_window_ok->SetLabel("Apply");
+
+		temp->option_window_ok->SetRequisition(sf::Vector2f(300, 30));
+
+		auto & resistance_entry_ref = temp->resistance_entry;
+
+		temp->option_window_ok->GetSignal(sfg::Widget::OnLeftClick ).Connect([&]{
+				resistance_entry_ref->SetText(regex_string(resistance_entry_ref->GetText()));
+		});
+
+		temp->option_window_ok_box->Pack(temp->option_window_ok);
+		temp->option_window_box->Pack(temp->option_window_ok_box, false, false);
 		temp->option_window->Add(temp->option_window_box);
+
 
 	} else if(name == "coil"){
 
 		temp = new Coil;
-		temp->option_window->SetTitle("Option window: Coil");
-
 		temp->resistance_label->SetText("Resistance");
+
 		temp->resistance_label->SetRequisition(sf::Vector2f(100, 20));
 
-		temp->resistance_entry->SetRequisition(sf::Vector2f(200, 20));
-		//temp->resistanse_entry->SetText();
-	
+		temp->resistance_entry->SetRequisition(sf::Vector2f(200, 20));	
 
 		temp->resistance_box->Pack(temp->resistance_label);
 		temp->resistance_box->Pack(temp->resistance_entry);
 
 		temp->option_window_box->Pack(temp->resistance_box, false, false);
 
-			temp->option_window->Add(temp->option_window_box);
+		temp->option_window->SetTitle("Option window: Coil");
+
+		temp->option_window_ok->SetLabel("Apply");
+
+		temp->option_window_ok->SetRequisition(sf::Vector2f(300, 30));
+
+		auto & resistance_entry_ref = temp->resistance_entry;
+
+		temp->option_window_ok->GetSignal(sfg::Widget::OnLeftClick ).Connect([&]{
+				resistance_entry_ref->SetText(regex_string(resistance_entry_ref->GetText()));	
+				desktop.BringToFront(sfgui_window);
+				desktop.BringToFront(sfgui_window_bar);
+		});
+
+		temp->option_window_ok_box->Pack(temp->option_window_ok);
+		temp->option_window_box->Pack(temp->option_window_ok_box, false, false);
+		temp->option_window->Add(temp->option_window_box);
 
 	}else if(name == "transistor"){
 
@@ -328,7 +440,6 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 	temp->option_window->SetRequisition(sf::Vector2f(300, 200));
 	temp->option_window->SetPosition(sf::Vector2f(temp->x + 30, temp->y + 30));
 
-	bool & state_r_o_w_ref = temp->state_render_option_window;
 
 	desktop.Add(element_map[id]->option_window);
 	temp->image->GetSignal(sfg::Image::OnMouseRightPress).Connect([&, id]{
@@ -382,7 +493,27 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 			fixed->Put( temp->vector_endings[i].ending_button, sf::Vector2f(temp->x + 30 - 3 - 5, temp->y + 60 - 3 - 5));
 	}	
 	fixed->Put( canvas, sf::Vector2f(0, 0));
+	desktop.BringToFront(sfgui_window_bar);
 	//std::cout<< fixed->GetAllocation() << "\n\n";
+
+		temp->indicator_label->SetText("Indicator: ");
+
+		temp->indicator_box->Pack(temp->indicator_label);
+
+		temp->option_window_box->Pack(temp->indicator_box, false, false);
+
+		temp->option_window_ok->SetLabel("Okay");
+
+		temp->option_window_ok->GetSignal(sfg::Widget::OnLeftClick).Connect([&]{
+				desktop.BringToFront(sfgui_window);
+				desktop.BringToFront(sfgui_window_bar);
+				});
+
+		temp->option_window_box->SetSpacing(5.f);
+
+		temp->option_window_ok_box->Pack(temp->option_window_ok);
+		temp->option_window_box->Pack(temp->option_window_ok_box, false, false);
+		temp->option_window->Add(temp->option_window_box);
 }
 
 int Hotwire::wire_making(int b1, int b2, int I_F_E_B, int I_S_E_B){
@@ -392,53 +523,105 @@ int Hotwire::wire_making(int b1, int b2, int I_F_E_B, int I_S_E_B){
 		Wire * temp_wire = new Wire;
 
 		wire_id++;
+		if(std::abs((element_map[b1]->x - element_map[b2]->x)) >= std::abs((element_map[b1]->y - element_map[b2]->y))){
+			element_map[b1]->vector_endings[I_F_E_B].other_element_id = b2;
+			element_map[b2]->vector_endings[I_S_E_B].other_element_id = b1;
 
-		element_map[b1]->vector_endings[I_F_E_B].other_element_id = b2;
-		element_map[b2]->vector_endings[I_S_E_B].other_element_id = b1;
-
-		temp_wire->wire.append(sf::Vertex(
-				sf::Vector2f(
-					element_map[b1]->vector_endings[I_F_E_B].ending_button->GetAllocation().left + 5,
-					element_map[b1]->vector_endings[I_F_E_B].ending_button->GetAllocation().top + 5),
-			sf::Color::Red));
-		
-		temp_wire->wire.append(sf::Vertex(
-				sf::Vector2f(
-					element_map[b1]->vector_endings[I_F_E_B].ending_button->GetAllocation().left + 5
-					- (element_map[b1]->vector_endings[I_F_E_B].ending_button->GetAllocation().left + 5 - 
-						element_map[b2]->vector_endings[I_S_E_B].ending_button->GetAllocation().left + 5)/2,
-
-					element_map[b1]->vector_endings[I_F_E_B].ending_button->GetAllocation().top + 5),
-			sf::Color::Red));
-
-		temp_wire->wire.append(sf::Vertex(
-				sf::Vector2f(	
-					element_map[b1]->vector_endings[I_F_E_B].ending_button->GetAllocation().left + 5
-					- (element_map[b1]->vector_endings[I_F_E_B].ending_button->GetAllocation().left + 5 - 
-						element_map[b2]->vector_endings[I_S_E_B].ending_button->GetAllocation().left + 5)/2,
-
-					element_map[b2]->vector_endings[I_S_E_B].ending_button->GetAllocation().top + 5),
-			sf::Color::Red));
-
-
-		temp_wire->wire.append(sf::Vertex(
+			temp_wire->wire.append(sf::Vertex(
 					sf::Vector2f(
-						element_map[b2]->vector_endings[I_S_E_B].ending_button->GetAllocation().left + 5,
+						element_map[b1]->vector_endings[I_F_E_B].ending_button->GetAllocation().left + 5,
+						element_map[b1]->vector_endings[I_F_E_B].ending_button->GetAllocation().top + 5),
+				sf::Color::Red));
+			
+			temp_wire->wire.append(sf::Vertex(
+					sf::Vector2f(
+						element_map[b1]->vector_endings[I_F_E_B].ending_button->GetAllocation().left + 5
+						- (element_map[b1]->vector_endings[I_F_E_B].ending_button->GetAllocation().left + 5 - 
+							element_map[b2]->vector_endings[I_S_E_B].ending_button->GetAllocation().left + 5)/2,
+
+						element_map[b1]->vector_endings[I_F_E_B].ending_button->GetAllocation().top + 5),
+				sf::Color::Red));
+
+			temp_wire->wire.append(sf::Vertex(
+					sf::Vector2f(	
+						element_map[b1]->vector_endings[I_F_E_B].ending_button->GetAllocation().left + 5
+						- (element_map[b1]->vector_endings[I_F_E_B].ending_button->GetAllocation().left + 5 - 
+							element_map[b2]->vector_endings[I_S_E_B].ending_button->GetAllocation().left + 5)/2,
+
 						element_map[b2]->vector_endings[I_S_E_B].ending_button->GetAllocation().top + 5),
-				sf::Color::Magenta));
-	
-		vector_wires.push_back(std::make_pair(b1, b2));
-		vector_wires.push_back(std::make_pair(b2, b1));
-
-		temp_wire->wire.setPrimitiveType ( sf::LinesStrip ) ;
-		vector_draw_wire.push_back(&temp_wire->wire);
-
-		std::cout<< "New wire: "<< b1 << ", " << b2 << "\n\n";
-		std::cout<< "Amount wire: " << wire_id <<"\n\n";
+				sf::Color::Red));
 
 
-	bufferFirstElement = -1;
-	bufferSecondElement = -1;
+			temp_wire->wire.append(sf::Vertex(
+						sf::Vector2f(
+							element_map[b2]->vector_endings[I_S_E_B].ending_button->GetAllocation().left + 5,
+							element_map[b2]->vector_endings[I_S_E_B].ending_button->GetAllocation().top + 5),
+					sf::Color::Magenta));
+		
+			vector_wires.push_back(std::make_pair(b1, b2));
+			vector_wires.push_back(std::make_pair(b2, b1));
+
+			temp_wire->wire.setPrimitiveType ( sf::LinesStrip ) ;
+			vector_draw_wire.push_back(&temp_wire->wire);
+
+			std::cout<< "New wire: "<< b1 << ", " << b2 << "\n\n";
+			std::cout<< "Amount wire: " << wire_id <<"\n\n";
+
+
+			bufferFirstElement = -1;
+			bufferSecondElement = -1;
+		}else{
+			
+			element_map[b1]->vector_endings[I_F_E_B].other_element_id = b2;
+			element_map[b2]->vector_endings[I_S_E_B].other_element_id = b1;
+
+			temp_wire->wire.append(sf::Vertex(
+					sf::Vector2f(
+						element_map[b1]->vector_endings[I_F_E_B].ending_button->GetAllocation().left + 5,
+						element_map[b1]->vector_endings[I_F_E_B].ending_button->GetAllocation().top + 5),
+				sf::Color::Red));
+			
+			temp_wire->wire.append(sf::Vertex(
+					sf::Vector2f(
+						element_map[b1]->vector_endings[I_F_E_B].ending_button->GetAllocation().left + 5,
+
+						element_map[b1]->vector_endings[I_F_E_B].ending_button->GetAllocation().top + 5 - 
+						(element_map[b1]->vector_endings[I_F_E_B].ending_button->GetAllocation().top + 5 -
+							element_map[b2]->vector_endings[I_S_E_B].ending_button->GetAllocation().top + 5 
+							)/2),
+				sf::Color::Red));
+
+			temp_wire->wire.append(sf::Vertex(
+					sf::Vector2f(	
+						element_map[b2]->vector_endings[I_S_E_B].ending_button->GetAllocation().left + 5,
+
+						element_map[b1]->vector_endings[I_F_E_B].ending_button->GetAllocation().top + 5 - 
+						(element_map[b1]->vector_endings[I_F_E_B].ending_button->GetAllocation().top + 5 -
+							element_map[b2]->vector_endings[I_S_E_B].ending_button->GetAllocation().top + 5 
+							)/2),
+				sf::Color::Red));
+
+
+			temp_wire->wire.append(sf::Vertex(
+						sf::Vector2f(
+							element_map[b2]->vector_endings[I_S_E_B].ending_button->GetAllocation().left + 5,
+							element_map[b2]->vector_endings[I_S_E_B].ending_button->GetAllocation().top + 5),
+					sf::Color::Magenta));
+		
+			vector_wires.push_back(std::make_pair(b1, b2));
+			vector_wires.push_back(std::make_pair(b2, b1));
+
+			temp_wire->wire.setPrimitiveType ( sf::LinesStrip ) ;
+			vector_draw_wire.push_back(&temp_wire->wire);
+
+			std::cout<< "New wire: "<< b1 << ", " << b2 << "\n\n";
+			std::cout<< "Amount wire: " << wire_id <<"\n\n";
+
+
+			bufferFirstElement = -1;
+			bufferSecondElement = -1;
+
+		}
 	}
 }
 
