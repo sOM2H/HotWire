@@ -187,15 +187,14 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 	id++;
 	Element * temp;
 
+
 	if(name == "lamp"){		
 		temp = new Lamp;
 
 		temp->resistance_label->SetText("Resistance");
 		temp->resistance_label->SetRequisition(sf::Vector2f(100, 20));
 
-		temp->resistance_entry->SetRequisition(sf::Vector2f(200, 20));
-		//temp->resistanse_entry->SetText();
-	
+		temp->resistance_entry->SetRequisition(sf::Vector2f(200, 20));	
 
 		temp->resistance_box->Pack(temp->resistance_label);
 		temp->resistance_box->Pack(temp->resistance_entry);
@@ -203,7 +202,22 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 		temp->option_window_box->Pack(temp->resistance_box, false, false);
 
 		temp->option_window->SetTitle("Option window: Lamp");
+
+		temp->option_window_ok->SetLabel("Apply");
+
+		temp->option_window_ok->SetRequisition(sf::Vector2f(300, 30));
+
+		auto & resistance_entry_ref = temp->resistance_entry;
+
+		temp->option_window_ok->GetSignal(sfg::Widget::OnLeftClick ).Connect([&]{
+				resistance_entry_ref->SetText(regex_string(resistance_entry_ref->GetText()));
+		});
+
+		temp->option_window_ok_box->Pack(temp->option_window_ok);
+		temp->option_window_box->Pack(temp->option_window_ok_box, false, false);
 		temp->option_window->Add(temp->option_window_box);
+
+		
 
 	}else if(name == "battery"){
 
@@ -227,8 +241,7 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 
 		temp->option_window_box->Pack(temp->resistance_box, false, false);
 
-		temp->option_window->SetTitle("Option window: Lamp");
-		temp->option_window->Add(temp->option_window_box);
+				temp->option_window->Add(temp->option_window_box);
 
 	} else if(name == "ampermeter"){
 
@@ -257,7 +270,6 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 
 		temp->option_window_box->Pack(temp->resistance_box, false, false);
 
-		temp->option_window->SetTitle("Option window: Lamp");
 		temp->option_window->Add(temp->option_window_box);
 
 	} else if(name == "coil"){
@@ -277,8 +289,7 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 
 		temp->option_window_box->Pack(temp->resistance_box, false, false);
 
-		temp->option_window->SetTitle("Option window: Lamp");
-		temp->option_window->Add(temp->option_window_box);
+			temp->option_window->Add(temp->option_window_box);
 
 	}else if(name == "transistor"){
 
@@ -290,18 +301,7 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 		temp = new Switch;
 		temp->option_window->SetTitle("Option window: Switch");
 
-		temp->resistance_label->SetText("Resistance");
-		temp->resistance_label->SetRequisition(sf::Vector2f(100, 20));
-
-		temp->resistance_entry->SetRequisition(sf::Vector2f(200, 20));
-		//temp->resistanse_entry->SetText();
 	
-		temp->resistance_box->Pack(temp->resistance_label);
-		temp->resistance_box->Pack(temp->resistance_entry);
-
-		temp->option_window_box->Pack(temp->resistance_box, false, false);
-
-		temp->option_window->SetTitle("Option window: Lamp");
 		temp->option_window->Add(temp->option_window_box);
 
 	} else if(name == "reostat"){
@@ -311,6 +311,7 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 	}else{
 		return 0;		
 	}
+
 	
 
 	//std::cout<< "Count element in set: "  <<elements_position_set.count( std::make_pair( ((pos.x/60))*60, ((pos.y/60))*60 )) << "\n\n";
@@ -411,7 +412,6 @@ int Hotwire::wire_making(int b1, int b2, int I_F_E_B, int I_S_E_B){
 					element_map[b1]->vector_endings[I_F_E_B].ending_button->GetAllocation().top + 5),
 			sf::Color::Red));
 
-
 		temp_wire->wire.append(sf::Vertex(
 				sf::Vector2f(	
 					element_map[b1]->vector_endings[I_F_E_B].ending_button->GetAllocation().left + 5
@@ -448,4 +448,23 @@ sf::Vector2i Hotwire::couting_amountImage(int ws_w, int ws_h, int img_s){
 	int w = ws_w/img_s;
 	int h = ws_h/img_s;
 	return sf::Vector2i(w, h);
+}
+
+std::string Hotwire::regex_string(std::string string){
+	bool dot = false;
+	std::string new_string;
+	for(int i = 0; i < string.length(); ++i){
+		if(string[i] >= '0' && string[i] <= '9'){
+			new_string += string[i];
+		}else{
+			if(((string[i] == '.') && (dot == false))){
+				if(i == 0){
+					new_string += '0';
+				}
+				new_string += '.';
+				dot = true;
+			}
+		}
+	}
+	return new_string;
 }
