@@ -38,7 +38,7 @@ class Hotwire{
 		sfg::Window::Ptr sfgui_window_bar = sfg::Window::Create(sfg::Window::Style::TITLEBAR | sfg::Window::Style::BACKGROUND);
 
 		sf::Vector2f pos_bar;
-		
+	
 
 		std::map<std::string, sfg::Image::Ptr> image_map;
 
@@ -62,7 +62,7 @@ class Hotwire{
 		int index_F_E_B = -1;
 		int index_S_E_B = -1;
 
-		bool render_bar = false;
+	//	bool render_bar = false;
         bool running = false;
 
 		int amountImageX;
@@ -73,6 +73,7 @@ class Hotwire{
 		int amountOfBatteries = 0;
 		int wire_id = 0;
 		int element_id = 0;
+
 
 		int element_making(std::string name, sf::Vector2i pos, int amountOfBatteries, int &id);
 		int wire_making(int b1, int b2, int I_F_E_B, int I_S_E_B);

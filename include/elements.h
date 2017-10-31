@@ -22,7 +22,6 @@ public:
 			: lay(lay)
 			, other_element_id(id) {
 				sfg::Image::Ptr sfg_image = sfg::Image::Create(texture_manager->sfml_image_map["loles"]);
-				//ending_button->SetSpacing(0.f);
 				ending_button->SetImage(sfg_image);
 			}
 
@@ -33,6 +32,12 @@ public:
 
 	sf::Image img;
 	sfg::Image::Ptr image = sfg::Image::Create();
+	sfg::Window::Ptr option_window = sfg::Window::Create( sfg::Window::Style::TITLEBAR | sfg::Window::Style::BACKGROUND | sfg::Window::Style::CLOSE);
+	bool state_render_option_window = false;
+	sfg::Box::Ptr option_window_box = sfg::Box::Create(sfg::Box::Orientation::VERTICAL);
+	sfg::Box::Ptr resistance_box = sfg::Box::Create();
+	sfg::Entry::Ptr resistance_entry = sfg::Entry::Create();
+	sfg::Label::Ptr resistance_label = sfg::Label::Create();
 	virtual void setImage() = 0;
 	virtual void init_endings() = 0;
 };
@@ -71,6 +76,7 @@ public:
 	Battery(){}
 	~Battery();
     void draw();
+
 	void setImage();
 	std::string getType();
 	void init_endings();
@@ -151,4 +157,14 @@ public:
 	void init_endings();
 };
 
+class Reostat : public Element{
+public:
+	Reostat(){}
+	~Reostat();
+    float resistance = 0;
+    void draw();
+	void setImage();
+	std::string getType();
+	void init_endings();
+};
 #endif

@@ -31,6 +31,19 @@ void Battery::init_endings(){
 
 }
 
+void Reostat::setImage(){
+	if(img.loadFromFile( "src/textures/reostat.png" )){
+		printf("Init new image: reostat.png\n\n");
+	}
+	image->SetImage(img);
+}
+
+void Reostat::init_endings(){
+	
+	vector_endings.push_back(ending("left"));
+	vector_endings.push_back(ending("right"));
+
+}
 void Resistor::setImage(){
 	if(img.loadFromFile( "src/textures/resistor.png" )){
 		printf("Init new image: resistor.png\n\n");
@@ -199,4 +212,12 @@ void Switch::draw(){
 
 std::string Switch::getType(){
 	return "switch";
+}
+
+
+void Reostat::draw(){
+}
+
+std::string Reostat::getType(){
+	return "reostat";
 }
