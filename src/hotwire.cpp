@@ -203,10 +203,8 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 		temp->option_window->SetTitle("Option window: Lamp");
 
 		temp->option_window_ok->SetLabel("Apply");
-		temp->delete_button->SetLabel("Delete");
-
+	
 		temp->option_window_ok->SetRequisition(sf::Vector2f(300, 30));
-		temp->delete_button->SetRequisition(sf::Vector2f(300, 30));
 
 		auto & resistance_entry_ref = temp->resistance_entry;
 
@@ -216,19 +214,10 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 				desktop.BringToFront(sfgui_window_bar);
 		});
 
-
-		temp->delete_button->GetSignal(sfg::Widget::OnLeftClick ).Connect([&, tempid = id]{
-				element_delete(tempid);
-				desktop.BringToFront(sfgui_window);
-				desktop.BringToFront(sfgui_window_bar);
-		});
-
 		temp->option_window_ok_box->Pack(temp->option_window_ok);
-		temp->delete_box->Pack(temp->delete_button);
 
 		temp->option_window_box->Pack(temp->option_window_ok_box, false, false);
-		temp->option_window_box->Pack(temp->delete_box, false, false);
-
+		
 		temp->option_window->Add(temp->option_window_box);
 
 	}else if(name == "battery"){
@@ -437,6 +426,18 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 	}
 
 	
+		temp->delete_button->SetLabel("Delete");
+
+		temp->delete_button->SetRequisition(sf::Vector2f(300, 30));
+
+		temp->delete_button->GetSignal(sfg::Widget::OnLeftClick ).Connect([&, tempid = id]{
+				element_delete(tempid);
+				desktop.BringToFront(sfgui_window);
+				desktop.BringToFront(sfgui_window_bar);
+		});
+
+		temp->delete_box->Pack(temp->delete_button);
+		temp->option_window_box->Pack(temp->delete_box, false, false);
 
 	//std::cout<< "Count element in set: "  <<elements_position_set.count( std::make_pair( ((pos.x/60))*60, ((pos.y/60))*60 )) << "\n\n";
 
