@@ -45,13 +45,18 @@ class Hotwire{
 		sfg::Fixed::Ptr fixed = sfg::Fixed::Create();
 		void init_image(const std::string & name);
 
-		std::map<int , Element* > element_map;
+		std::map<int, Element* > element_map;
+		std::map<int, Wire* > wires_map;
 
 		std::set<std::pair<int, int> > elements_position_set;	
 
 		std::vector<std::pair<int, int> > vector_wires;
-		sf::VertexArray wires;
-		std::vector<sf::VertexArray *> vector_draw_wire;
+
+		struct wires_struct{
+			sf::VertexArray wires;
+		};
+
+		std::map<int, sf::VertexArray *> map_draw_wire;
 		//std::vector<sf::CircleShape *> vector_draw_circleshape;
 
 		std::string buffer = "empty";
@@ -73,6 +78,8 @@ class Hotwire{
 		int wire_id = 0;
 		int element_id = 0;
 
+
+		int element_delete(int id);
 
 		int element_making(std::string name, sf::Vector2i pos, int amountOfBatteries, int &id);
 		int wire_making(int b1, int b2, int I_F_E_B, int I_S_E_B);

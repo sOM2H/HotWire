@@ -53,6 +53,7 @@ public:
 	sfg::Box::Ptr resistance_box = sfg::Box::Create();
 	sfg::Box::Ptr voltage_box = sfg::Box::Create();
 	sfg::Box::Ptr indicator_box = sfg::Box::Create();
+	sfg::Box::Ptr delete_box = sfg::Box::Create();
 
 	sfg::Entry::Ptr resistance_entry = sfg::Entry::Create();
 	sfg::Label::Ptr resistance_label = sfg::Label::Create();
@@ -62,6 +63,8 @@ public:
 
 	sfg::Label::Ptr indicator_label = sfg::Label::Create();
 
+	sfg::Button::Ptr delete_button = sfg::Button::Create();
+
 	virtual void setImage() = 0;
 	virtual void init_endings() = 0;
 };
@@ -70,6 +73,9 @@ class Wire{
 public:
 	Wire(){}
 	~Wire();
+	int id;
+	int first_other_id = -1;
+	int second_other_id = -1;
 	sf::VertexArray wire;
 };
 
