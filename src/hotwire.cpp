@@ -143,6 +143,7 @@ void Hotwire::render(){
 	desktop.Update(0.f);
     render_window.clear();
 	canvas->Bind();
+	canvas->Clear(sf::Color(70, 70, 70));
 	for(auto p : map_draw_wire) {
 		canvas->Draw(*p.second);
 	}
@@ -497,7 +498,8 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 	buffer = "empty";
 	std::cout<< "buffer: "<< buffer << "\n\n";
 	sfg::Widget::Ptr canvas = fixed->GetChildren().back();
-	fixed->Remove(canvas);
+	//fixed->Remove(canvas);
+	fixed->Put( canvas, sf::Vector2f(0, 0));
 	fixed->Put( temp->image, sf::Vector2f(temp->x, temp->y));
 	for(int i = 0; i < temp->vector_endings.size(); ++i){
 		if(temp->vector_endings[i].lay == "left")
@@ -507,7 +509,6 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 		if(temp->vector_endings[i].lay == "down")
 			fixed->Put( temp->vector_endings[i].ending_button, sf::Vector2f(temp->x + 30 - 3 - 5, temp->y + 60 - 3 - 5));
 	}	
-	fixed->Put( canvas, sf::Vector2f(0, 0));
 	desktop.BringToFront(sfgui_window_bar);
 }
 
@@ -522,6 +523,7 @@ int Hotwire::wire_making(int b1, int b2, int I_F_E_B, int I_S_E_B){
 		wires_map[wire_id] = temp_wire;
 
 		if(std::abs((element_map[b1]->x - element_map[b2]->x)) >= std::abs((element_map[b1]->y - element_map[b2]->y))){
+
 			element_map[b1]->vector_endings[I_F_E_B].other_element_id = b2;
 			element_map[b2]->vector_endings[I_S_E_B].other_element_id = b1;
 
@@ -556,18 +558,6 @@ int Hotwire::wire_making(int b1, int b2, int I_F_E_B, int I_S_E_B){
 							element_map[b2]->vector_endings[I_S_E_B].ending_button->GetAllocation().top + 5),
 					sf::Color::Red));
 		
-			vector_wires.push_back(std::make_pair(b1, b2));
-			vector_wires.push_back(std::make_pair(b2, b1));
-
-			temp_wire->wire.setPrimitiveType ( sf::LinesStrip ) ;
-			map_draw_wire[wire_id] = &temp_wire->wire;
-
-			std::cout<< "New wire: "<< b1 << ", " << b2 << "\n\n";
-			std::cout<< "Amount wire: " << wire_id <<"\n\n";
-
-
-			bufferFirstElement = -1;
-			bufferSecondElement = -1;
 		}else{
 			
 			element_map[b1]->vector_endings[I_F_E_B].other_element_id = b2;
@@ -607,9 +597,20 @@ int Hotwire::wire_making(int b1, int b2, int I_F_E_B, int I_S_E_B){
 							element_map[b2]->vector_endings[I_S_E_B].ending_button->GetAllocation().top + 5),
 					sf::Color::Magenta));
 		
+
+		}
+		
 			vector_wires.push_back(std::make_pair(b1, b2));
 			vector_wires.push_back(std::make_pair(b2, b1));
 
+			element_map[b1]->vector_endings[I_F_E_B].other_element_id = b2;
+			element_map[b2]->vector_endings[I_S_E_B].other_element_id = b1;
+
+			element_map[b1]->vector_endings[I_F_E_B].wire_id_ = wire_id;
+			element_map[b2]->vector_endings[I_S_E_B].wire_id_ = wire_id;
+
+			temp_wire->first_other_id = b1;
+			temp_wire->second_other_id = b2;
 
 
 			temp_wire->wire.setPrimitiveType ( sf::LinesStrip ) ;
@@ -621,8 +622,6 @@ int Hotwire::wire_making(int b1, int b2, int I_F_E_B, int I_S_E_B){
 
 			bufferFirstElement = -1;
 			bufferSecondElement = -1;
-
-		}
 	}
 }
 
@@ -653,11 +652,32 @@ std::string Hotwire::regex_string(std::string string){
 }
 
 int Hotwire::element_delete(int id){
+	int temp_id = -1;
+	for(int i = 0; i < element_map[id]->vector_endings.size(); ++i){
+		temp_id = element_map[id]->vector_endings[i].other_element_id;
+		if(temp_id != -1){
+			std::cout<< "temp_id" <<temp_id << "\n";
+			for(int j = 0; j < element_map[temp_id]->vector_endings.size(); ++j){
+				if(element_map[temp_id]->vector_endings[j].other_element_id == id){
+					element_map[temp_id]->vector_endings[j].other_element_id = -1;
+					element_map[id]->vector_endings[i].other_element_id	= -1;
+	//				vector_wires.pop_back(std::make_pair(element_map[id]->vector_endings[i].other_element_id, element_map[temp_id]->vector_endings[j].other_element_id));	
+					map_draw_wire.erase(element_map[id]->vector_endings[i].wire_id_);
+					std::cout<< "element_map[id]->vector_endings[i].wire_id_ = " << element_map[id]->vector_endings[i].wire_id_ << "\n";
+					std::cout<<"map_draw_wire.size(): "<< map_draw_wire.size() << "\n";
+				}
+			}
+			temp_id = -1;
+		}
+
+	}	
+
 	elements_position_set.erase(std::make_pair(element_map[id]->x, element_map[id]->y));
+
 	for(int i = 0; i < element_map[id]->vector_endings.size(); ++i){
 		fixed->Remove(element_map[id]->vector_endings[i].ending_button);
 	}
+
 	fixed->Remove(element_map[id]->image);
 	element_map.erase(id);
-	std::cout<< id <<"\n";	
 }
