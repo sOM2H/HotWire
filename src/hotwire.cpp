@@ -385,7 +385,7 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 		temp->resistance_box->Pack(temp->resistance_label);
 		temp->resistance_box->Pack(temp->resistance_entry);
 
-		temp->option_window_box->Pack(temp->resistance_box, false, false);
+		temp->option_window_box->Pack(temp->resistance_box);
 
 		temp->option_window->SetTitle("Option window: Coil");
 
@@ -401,7 +401,7 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 				desktop.BringToFront(sfgui_window_bar);
 		});
 
-		temp->option_window_ok_box->Pack(temp->option_window_ok);
+		temp->option_window_ok_box->Pack(temp->option_window_ok, false, false);
 		temp->option_window_box->Pack(temp->option_window_ok_box, false, false);
 		temp->option_window->Add(temp->option_window_box);
 
@@ -499,7 +499,7 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 	std::cout<< "buffer: "<< buffer << "\n\n";
 	sfg::Widget::Ptr canvas = fixed->GetChildren().back();
 	//fixed->Remove(canvas);
-	fixed->Put( canvas, sf::Vector2f(0, 0));
+	//fixed->Put( canvas, sf::Vector2f(0, 0));
 	fixed->Put( temp->image, sf::Vector2f(temp->x, temp->y));
 	for(int i = 0; i < temp->vector_endings.size(); ++i){
 		if(temp->vector_endings[i].lay == "left")
@@ -531,7 +531,7 @@ int Hotwire::wire_making(int b1, int b2, int I_F_E_B, int I_S_E_B){
 					sf::Vector2f(
 						element_map[b1]->vector_endings[I_F_E_B].ending_button->GetAllocation().left + 5,
 						element_map[b1]->vector_endings[I_F_E_B].ending_button->GetAllocation().top + 5),
-				sf::Color::Red));
+				sf::Color::Yellow));
 			
 			temp_wire->wire.append(sf::Vertex(
 					sf::Vector2f(
@@ -540,7 +540,7 @@ int Hotwire::wire_making(int b1, int b2, int I_F_E_B, int I_S_E_B){
 							element_map[b2]->vector_endings[I_S_E_B].ending_button->GetAllocation().left + 5)/2,
 
 						element_map[b1]->vector_endings[I_F_E_B].ending_button->GetAllocation().top + 5),
-				sf::Color::Red));
+				sf::Color::Yellow));
 
 			temp_wire->wire.append(sf::Vertex(
 					sf::Vector2f(	
@@ -549,14 +549,14 @@ int Hotwire::wire_making(int b1, int b2, int I_F_E_B, int I_S_E_B){
 							element_map[b2]->vector_endings[I_S_E_B].ending_button->GetAllocation().left + 5)/2,
 
 						element_map[b2]->vector_endings[I_S_E_B].ending_button->GetAllocation().top + 5),
-				sf::Color::Red));
+				sf::Color::Yellow));
 
 
 			temp_wire->wire.append(sf::Vertex(
 						sf::Vector2f(
 							element_map[b2]->vector_endings[I_S_E_B].ending_button->GetAllocation().left + 5,
 							element_map[b2]->vector_endings[I_S_E_B].ending_button->GetAllocation().top + 5),
-					sf::Color::Red));
+					sf::Color::Yellow));
 		
 		}else{
 			
@@ -568,7 +568,7 @@ int Hotwire::wire_making(int b1, int b2, int I_F_E_B, int I_S_E_B){
 					sf::Vector2f(
 						element_map[b1]->vector_endings[I_F_E_B].ending_button->GetAllocation().left + 5,
 						element_map[b1]->vector_endings[I_F_E_B].ending_button->GetAllocation().top + 5),
-				sf::Color::Red));
+				sf::Color::Yellow));
 			
 			temp_wire->wire.append(sf::Vertex(
 					sf::Vector2f(
@@ -578,7 +578,7 @@ int Hotwire::wire_making(int b1, int b2, int I_F_E_B, int I_S_E_B){
 						(element_map[b1]->vector_endings[I_F_E_B].ending_button->GetAllocation().top + 5 -
 							element_map[b2]->vector_endings[I_S_E_B].ending_button->GetAllocation().top + 5 
 							)/2),
-				sf::Color::Red));
+				sf::Color::Yellow));
 
 			temp_wire->wire.append(sf::Vertex(
 					sf::Vector2f(	
@@ -588,14 +588,14 @@ int Hotwire::wire_making(int b1, int b2, int I_F_E_B, int I_S_E_B){
 						(element_map[b1]->vector_endings[I_F_E_B].ending_button->GetAllocation().top + 5 -
 							element_map[b2]->vector_endings[I_S_E_B].ending_button->GetAllocation().top + 5 
 							)/2),
-				sf::Color::Red));
+				sf::Color::Yellow));
 
 
 			temp_wire->wire.append(sf::Vertex(
 						sf::Vector2f(
 							element_map[b2]->vector_endings[I_S_E_B].ending_button->GetAllocation().left + 5,
 							element_map[b2]->vector_endings[I_S_E_B].ending_button->GetAllocation().top + 5),
-					sf::Color::Magenta));
+					sf::Color::Yellow));
 		
 
 		}
@@ -661,7 +661,7 @@ int Hotwire::element_delete(int id){
 				if(element_map[temp_id]->vector_endings[j].other_element_id == id){
 					element_map[temp_id]->vector_endings[j].other_element_id = -1;
 					element_map[id]->vector_endings[i].other_element_id	= -1;
-	//				vector_wires.pop_back(std::make_pair(element_map[id]->vector_endings[i].other_element_id, element_map[temp_id]->vector_endings[j].other_element_id));	
+					vector_wires.erase( std::find(vector_wires.begin(), vector_wires.end(), std::make_pair(element_map[id]->vector_endings[i].other_element_id, element_map[temp_id]->vector_endings[j].other_element_id)));	
 					map_draw_wire.erase(element_map[id]->vector_endings[i].wire_id_);
 					std::cout<< "element_map[id]->vector_endings[i].wire_id_ = " << element_map[id]->vector_endings[i].wire_id_ << "\n";
 					std::cout<<"map_draw_wire.size(): "<< map_draw_wire.size() << "\n";
