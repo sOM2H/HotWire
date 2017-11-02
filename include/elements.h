@@ -5,16 +5,20 @@
 #include <SFGUI/SFGUI.hpp>
 #include <SFGUI/Widgets.hpp>
 
+
 class Element{
 public:
     int  x;
     int  y;
 	int id;
+	float amperage = 0;
+	float throughput = 0;
 	virtual void draw() = 0;
 	virtual std::string getType() = 0;
 
 	struct ending{
 		int other_element_id = -1;
+		int wire_id_ = -1;
 		std::string lay = "none";
 		sfg::Button::Ptr ending_button = sfg::Button::Create();
 
@@ -29,7 +33,7 @@ public:
 	};
 
 	struct knot{
-		std::string lay = "eny";
+		std::string lay = "eny";	
 		sfg::Button::Ptr ending_button = sfg::Button::Create();
 		knot(){
 			sfg::Image::Ptr sfg_image = sfg::Image::Create(texture_manager->sfml_image_map["dot"]);

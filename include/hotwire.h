@@ -80,11 +80,15 @@ class Hotwire{
 
 
 		int element_delete(int id);
+		int current_bypass(int id);
+		int current_bypass2(int id, int id2);
 
 		int element_making(std::string name, sf::Vector2i pos, int amountOfBatteries, int &id);
 		int wire_making(int b1, int b2, int I_F_E_B, int I_S_E_B);
 
 		std::string regex_string(std::string string);
+
+
         void init();
         void handle_events();
         void render();

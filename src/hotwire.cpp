@@ -6,8 +6,8 @@
 #include <algorithm>
 
 Hotwire::Hotwire()
-	/*: render_window(sf::VideoMode(800, 600), "HotWire", 5)*/
-	: render_window(sf::VideoMode(0, 0), "HotWire", sf::Style::Fullscreen) {
+	: render_window(sf::VideoMode(800, 600), "HotWire", 5)
+	/*: render_window(sf::VideoMode(0, 0), "HotWire", sf::Style::Fullscreen)*/ {
 	render_window.setKeyRepeatEnabled(false);
 }
 
@@ -155,6 +155,13 @@ void Hotwire::render(){
 }
 
 void Hotwire::update(){
+	/*
+	for(int i = 0; i < element_map.size(); ++i){
+		if(element_map[i+1]->getType() == "battery"){
+			current_bypass(i);
+		}
+	}
+	*/
 }
 
 void Hotwire::clear(){
@@ -219,7 +226,6 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 
 		temp->option_window_box->Pack(temp->option_window_ok_box, false, false);
 		
-		temp->option_window->Add(temp->option_window_box);
 
 	}else if(name == "battery"){
 
@@ -245,15 +251,15 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 
 		auto & voltage_entry_ref = temp->voltage_entry;
 
-		temp->option_window_ok->GetSignal(sfg::Widget::OnLeftClick ).Connect([&]{
-				voltage_entry_ref->SetText(regex_string(voltage_entry_ref->GetText()));	
+		temp->option_window_ok->GetSignal(sfg::Widget::OnLeftClick ).Connect([&, tempid = id]{
+				voltage_entry_ref->SetText(regex_string(voltage_entry_ref->GetText()));
+				current_bypass(tempid);
 				desktop.BringToFront(sfgui_window);
 				desktop.BringToFront(sfgui_window_bar);
 		});
 
 		temp->option_window_ok_box->Pack(temp->option_window_ok);
 		temp->option_window_box->Pack(temp->option_window_ok_box, false, false);
-		temp->option_window->Add(temp->option_window_box);
 
 
 	} else if(name == "resistor"){
@@ -286,7 +292,6 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 
 		temp->option_window_ok_box->Pack(temp->option_window_ok);
 		temp->option_window_box->Pack(temp->option_window_ok_box, false, false);
-		temp->option_window->Add(temp->option_window_box);
 
 
 
@@ -304,6 +309,7 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 		//std::vector<sf::CircleShape *> vector_draw_circleshape;
 		temp->option_window_ok->SetLabel("Okay");
 
+
 		temp->option_window_ok->GetSignal(sfg::Widget::OnLeftClick).Connect([&]{
 				desktop.BringToFront(sfgui_window);
 				desktop.BringToFront(sfgui_window_bar);
@@ -313,7 +319,6 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 
 		temp->option_window_ok_box->Pack(temp->option_window_ok);
 		temp->option_window_box->Pack(temp->option_window_ok_box, false, false);
-		temp->option_window->Add(temp->option_window_box);
 
 
 	} else if(name == "voltmeter"){
@@ -339,7 +344,6 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 
 		temp->option_window_ok_box->Pack(temp->option_window_ok);
 		temp->option_window_box->Pack(temp->option_window_ok_box, false, false);
-		temp->option_window->Add(temp->option_window_box);
 
 
 	} else if(name == "bell"){
@@ -370,7 +374,6 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 
 		temp->option_window_ok_box->Pack(temp->option_window_ok);
 		temp->option_window_box->Pack(temp->option_window_ok_box, false, false);
-		temp->option_window->Add(temp->option_window_box);
 
 
 	} else if(name == "coil"){
@@ -385,7 +388,7 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 		temp->resistance_box->Pack(temp->resistance_label);
 		temp->resistance_box->Pack(temp->resistance_entry);
 
-		temp->option_window_box->Pack(temp->resistance_box);
+		temp->option_window_box->Pack(temp->resistance_box, false, false);
 
 		temp->option_window->SetTitle("Option window: Coil");
 
@@ -439,6 +442,8 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 
 		temp->delete_box->Pack(temp->delete_button);
 		temp->option_window_box->Pack(temp->delete_box, false, false);
+		
+		temp->option_window->Add(temp->option_window_box);
 
 	//std::cout<< "Count element in set: "  <<elements_position_set.count( std::make_pair( ((pos.x/60))*60, ((pos.y/60))*60 )) << "\n\n";
 
@@ -447,7 +452,7 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 
 	elements_position_set.insert(std::make_pair( ((pos.x/60))*60, ((pos.y/60))*60 ));
 
-	temp->id = element_id;
+	temp->id = id;
     element_map[id] = temp;
 
 	temp->setImage();
@@ -522,7 +527,7 @@ int Hotwire::wire_making(int b1, int b2, int I_F_E_B, int I_S_E_B){
 
 		wires_map[wire_id] = temp_wire;
 
-		if(std::abs((element_map[b1]->x - element_map[b2]->x)) >= std::abs((element_map[b1]->y - element_map[b2]->y))){
+		if(std::abs((element_map[b1]->x - element_map[b2]->x)) == std::abs((element_map[b1]->y - element_map[b2]->y))){
 
 			element_map[b1]->vector_endings[I_F_E_B].other_element_id = b2;
 			element_map[b2]->vector_endings[I_S_E_B].other_element_id = b1;
@@ -644,9 +649,13 @@ std::string Hotwire::regex_string(std::string string){
 					new_string += '0';
 				}
 				new_string += '.';
+
 				dot = true;
 			}
 		}
+	}
+	if(new_string[new_string.length() - 1] == '.'){
+		new_string += '0';
 	}
 	return new_string;
 }
@@ -659,10 +668,23 @@ int Hotwire::element_delete(int id){
 			std::cout<< "temp_id" <<temp_id << "\n";
 			for(int j = 0; j < element_map[temp_id]->vector_endings.size(); ++j){
 				if(element_map[temp_id]->vector_endings[j].other_element_id == id){
+
+					auto it = std::find(vector_wires.begin(), vector_wires.end(), std::make_pair(temp_id, id));
+					while (it != vector_wires.end()) {
+						vector_wires.erase(it);
+						it = std::find(vector_wires.begin(), vector_wires.end(), std::make_pair(temp_id, id));
+					}
+					it = std::find(vector_wires.begin(), vector_wires.end(), std::make_pair(id, temp_id));
+					while (it != vector_wires.end()) {
+						vector_wires.erase(it);
+						it = std::find(vector_wires.begin(), vector_wires.end(), std::make_pair(id, temp_id));
+					}
+
 					element_map[temp_id]->vector_endings[j].other_element_id = -1;
 					element_map[id]->vector_endings[i].other_element_id	= -1;
-					vector_wires.erase( std::find(vector_wires.begin(), vector_wires.end(), std::make_pair(element_map[id]->vector_endings[i].other_element_id, element_map[temp_id]->vector_endings[j].other_element_id)));	
+
 					map_draw_wire.erase(element_map[id]->vector_endings[i].wire_id_);
+					map_draw_wire.erase(element_map[temp_id]->vector_endings[j].wire_id_);
 					std::cout<< "element_map[id]->vector_endings[i].wire_id_ = " << element_map[id]->vector_endings[i].wire_id_ << "\n";
 					std::cout<<"map_draw_wire.size(): "<< map_draw_wire.size() << "\n";
 				}
@@ -680,4 +702,41 @@ int Hotwire::element_delete(int id){
 
 	fixed->Remove(element_map[id]->image);
 	element_map.erase(id);
+}
+
+int Hotwire::current_bypass(int id){
+	float temp_amperage = element_map[id]->amperage;
+	int temp_id;
+	for(int i = 0; i < element_map[id]->vector_endings.size(); ++i){
+		if(element_map[id]->vector_endings[i].other_element_id != -1){
+			temp_id = element_map[id]->vector_endings[i].other_element_id;
+			element_map[ temp_id ]->amperage = temp_amperage;
+			for(int j = 0; j < 4; ++j){
+				wires_map[ element_map[ id ]->vector_endings[i].wire_id_]->wire[j].color = sf::Color::Red;
+			}
+		}
+	 }
+	if(element_map[temp_id]->getType() != "battery" ){
+		std::cout<<"temp_id = "<< temp_id<<"\n";
+		current_bypass2(temp_id, id);
+	}
+}
+
+
+int Hotwire::current_bypass2(int id, int id2){
+	float temp_amperage = element_map[id]->amperage;
+	int temp_id;
+	for(int i = 0; i < element_map[id]->vector_endings.size(); ++i){
+		if(element_map[id]->vector_endings[i].other_element_id != -1){
+			temp_id = element_map[id]->vector_endings[i].other_element_id;
+			element_map[ temp_id ]->amperage = temp_amperage;	
+			if((element_map[temp_id]->getType() != "battery") && (temp_id != id2  )){
+				std::cout<<"temp_id = "<< temp_id<<"\n";
+				current_bypass2(temp_id, id);
+			}
+			for(int j = 0; j < 4; ++j){
+				wires_map[ element_map[ id ]->vector_endings[i].wire_id_]->wire[j].color = sf::Color::Red;
+			}
+		}
+	 }
 }
