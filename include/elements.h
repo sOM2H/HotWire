@@ -188,6 +188,7 @@ public:
 	~Switch();
     float resistance = 0;
     void draw();
+	bool state = true;
 	void setImage();
 	std::string getType();
 	void init_endings();

@@ -27,6 +27,21 @@ void Hotwire::init(){
 	sfgui_window_bar->SetPosition(sf::Vector2f(0, 0));
 
 
+
+	clear_button->SetLabel("Clear Map");
+
+	clear_button->SetRequisition(sf::Vector2f(60, 20));
+
+	clear_button->GetSignal(sfg::Widget::OnLeftClick ).Connect([&]{
+		for (auto & p : element_map) {
+			element_delete(p.first);
+			desktop.BringToFront(sfgui_window);	
+			desktop.BringToFront(sfgui_window_bar);
+		}
+	});
+
+	
+
 	scrolledwindow->SetScrollbarPolicy(sfg::ScrolledWindow::HORIZONTAL_NEVER |  sfg::ScrolledWindow::VERTICAL_AUTOMATIC);
 	scrolledwindow->SetRequisition(sf::Vector2f(60, 270));
 
@@ -63,6 +78,12 @@ void Hotwire::init(){
 	    element_making(buffer_ref, sf::Vector2i(mouse.getPosition(render_window).x, mouse.getPosition(render_window).y), amountOfBatteries, element_id);
 	});
 
+    sfgui_window->GetSignal(sfg::Window::OnMouseLeftPress).Connect([&]{
+		desktop.BringToFront(sfgui_window_bar);
+	});
+
+
+	boxIN->Pack(clear_button);
     boxIN->Pack(image_map["lamp"]);
     boxIN->Pack(image_map["resistor"]);
     boxIN->Pack(image_map["battery"]);
@@ -72,7 +93,7 @@ void Hotwire::init(){
 	boxIN->Pack(image_map["reostat"]);
 	boxIN->Pack(image_map["coil"]);
     boxIN->Pack(image_map["ampermeter"]);
-    boxIN->Pack(image_map["voltmeter"]);
+    boxIN->Pack(image_map["voltmeter"]);	
 
 
     canvas->SetRequisition(sf::Vector2f(SFGUI_WS_W, SFGUI_WS_H));
@@ -155,7 +176,13 @@ void Hotwire::render(){
 }
 
 void Hotwire::update(){
+	for (auto & p : wires_map) {
+		for(int j = 0; j < 4; ++j){
+					wires_map[ p.first ]->wire[j].color = sf::Color::Yellow;
+		}
+	}
 	for (auto & p : element_map) {
+		element_map[p.first]->throughput = false;
 		if(p.second->getType() == "battery"){
 			current_bypass(p.first);
 		}
@@ -625,6 +652,7 @@ int Hotwire::wire_making(int b1, int b2, int I_F_E_B, int I_S_E_B){
 			bufferFirstElement = -1;
 			bufferSecondElement = -1;
 	}
+	return wire_id;
 }
 
 
@@ -662,7 +690,7 @@ int Hotwire::element_delete(int id){
 	for(int i = 0; i < element_map[id]->vector_endings.size(); ++i){
 		temp_id = element_map[id]->vector_endings[i].other_element_id;
 		if(temp_id != -1){
-			std::cout<< "temp_id" <<temp_id << "\n";
+			std::cout<< "temp_id = " <<temp_id << "\n";
 			for(int j = 0; j < element_map[temp_id]->vector_endings.size(); ++j){
 				if(element_map[temp_id]->vector_endings[j].other_element_id == id){
 					auto it = std::find(vector_wires.begin(), vector_wires.end(), std::make_pair(temp_id, id));
@@ -688,6 +716,7 @@ int Hotwire::element_delete(int id){
 			temp_id = -1;
 		}
 
+
 	}	
 
 	elements_position_set.erase(std::make_pair(element_map[id]->x, element_map[id]->y));
@@ -698,6 +727,9 @@ int Hotwire::element_delete(int id){
 
 	fixed->Remove(element_map[id]->image);
 	element_map.erase(id);
+
+	bufferFirstElement = -1;
+	bufferSecondElement = -1;
 }
 
 int Hotwire::current_bypass(int id){
@@ -708,11 +740,11 @@ int Hotwire::current_bypass(int id){
 			}
 		if(element_map[id]->vector_endings[i].other_element_id != -1){
 			temp_id = element_map[id]->vector_endings[i].other_element_id;
-			element_map[ temp_id ]->throughput = true;
 			for(int j = 0; j < 4; ++j){
 				wires_map[ element_map[ id ]->vector_endings[i].wire_id_]->wire[j].color = sf::Color::Red;
 			}
-			if(element_map[temp_id]->getType() != "battery" ){
+			if(element_map[temp_id]->getType() != "battery" && element_map[temp_id]->getType() != "voltmeter"){
+				element_map[ temp_id ]->throughput = true;
 				current_bypass2(temp_id, id);
 			}
 		}
@@ -724,12 +756,9 @@ int Hotwire::current_bypass2(int id, int id2){
 	int temp_id;
 	for(int i = 0; i < element_map[id]->vector_endings.size(); ++i){	
 		if(element_map[id]->vector_endings[i].other_element_id != -1){
-			for(int j = 0; j < 4; ++j){
-				wires_map[ element_map[ id ]->vector_endings[i].wire_id_]->wire[j].color = sf::Color::Yellow;
-			}
 			temp_id = element_map[id]->vector_endings[i].other_element_id;
-			element_map[ temp_id ]->throughput = true;	
 			if((element_map[temp_id]->getType() != "battery") && (temp_id != id2  ) && (element_map[temp_id]->getType() != "voltmeter")){
+				element_map[ temp_id ]->throughput = true;	
 				current_bypass2(temp_id, id);
 			}
 			for(int j = 0; j < 4; ++j){
@@ -737,4 +766,41 @@ int Hotwire::current_bypass2(int id, int id2){
 			}
 		}
 	 }
+}
+
+
+int Hotwire::wire_delete(int id){
+	int temp_id = -1;
+	for(int i = 0; i < element_map[id]->vector_endings.size(); ++i){
+		temp_id = element_map[id]->vector_endings[i].other_element_id;
+		if(temp_id != -1){
+			std::cout<< "temp_id = " <<temp_id << "\n";
+			for(int j = 0; j < element_map[temp_id]->vector_endings.size(); ++j){
+				if(element_map[temp_id]->vector_endings[j].other_element_id == id){
+					auto it = std::find(vector_wires.begin(), vector_wires.end(), std::make_pair(temp_id, id));
+					while (it != vector_wires.end()) {
+						vector_wires.erase(it);
+						it = std::find(vector_wires.begin(), vector_wires.end(), std::make_pair(temp_id, id));
+					}
+					it = std::find(vector_wires.begin(), vector_wires.end(), std::make_pair(id, temp_id));
+					while (it != vector_wires.end()) {
+						vector_wires.erase(it);
+						it = std::find(vector_wires.begin(), vector_wires.end(), std::make_pair(id, temp_id));
+					}
+
+					element_map[temp_id]->vector_endings[j].other_element_id = -1;
+					element_map[id]->vector_endings[i].other_element_id	= -1;
+
+					map_draw_wire.erase(element_map[id]->vector_endings[i].wire_id_);
+					map_draw_wire.erase(element_map[temp_id]->vector_endings[j].wire_id_);
+					std::cout<< "element_map[id]->vector_endings[i].wire_id_ = " << element_map[id]->vector_endings[i].wire_id_ << "\n";
+					std::cout<<"map_draw_wire.size(): "<< map_draw_wire.size() << "\n";
+				}
+			}
+			temp_id = -1;
+		}
+	}	
+	
+	bufferFirstElement = -1;
+	bufferSecondElement = -1;
 }

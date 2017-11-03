@@ -37,6 +37,8 @@ class Hotwire{
 		sfg::Window::Ptr sfgui_window_pause = sfg::Window::Create();
 		sfg::Window::Ptr sfgui_window_bar = sfg::Window::Create(sfg::Window::Style::TITLEBAR | sfg::Window::Style::BACKGROUND);
 
+		sfg::Button::Ptr clear_button = sfg::Button::Create();
+
 		sf::Vector2f pos_bar;
 	
 
@@ -80,6 +82,8 @@ class Hotwire{
 
 
 		int element_delete(int id);
+		int wire_delete(int id);
+
 		int current_bypass(int id);
 		int current_bypass2(int id, int id2);
 
