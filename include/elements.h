@@ -12,7 +12,7 @@ public:
     int  y;
 	int id;
 	float amperage = 0;
-	float throughput = 0;
+	bool throughput = false;
 	virtual void draw() = 0;
 	virtual std::string getType() = 0;
 
