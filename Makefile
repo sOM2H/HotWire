@@ -4,7 +4,6 @@ objs=$(patsubst src/%.cpp,obj/%.o,$(wildcard src/*.cpp))
 flags=-g
 
 all: bin obj $(bin)
-	./$(bin)
 
 bin:
 	mkdir bin

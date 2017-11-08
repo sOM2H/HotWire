@@ -74,9 +74,7 @@ class Hotwire{
 		int amountImageX;
 		int amountImagey;
 
-		sf::Vector2i couting_amountImage(int ws_w, int ws_h, int img_s);
 
-		int amountOfBatteries = 0;
 		int wire_id = 0;
 		int element_id = 0;
 
@@ -84,10 +82,10 @@ class Hotwire{
 		int element_delete(int id);
 		int wire_delete(int id);
 
-		int current_bypass(int id);
-		int current_bypass2(int id, int id2);
+		int search_circuid(int id);
+		int dfs(int id, int before_id, int before_ending_id);
 
-		int element_making(std::string name, sf::Vector2i pos, int amountOfBatteries, int &id);
+		int element_making(std::string name, sf::Vector2i pos);
 		int wire_making(int b1, int b2, int I_F_E_B, int I_S_E_B);
 
 		std::string regex_string(std::string string);

@@ -8,17 +8,19 @@
 
 class Element{
 public:
-    int  x;
+int  x;
     int  y;
 	int id;
 	float amperage = 0;
 	bool throughput = false;
+	bool visited = false;
 	virtual void draw() = 0;
 	virtual std::string getType() = 0;
 
 	struct ending{
 		int other_element_id = -1;
-		int wire_id_ = -1;
+		int other_element_ending_id = -1;
+		int wire_id = -1;
 		std::string lay = "none";
 		sfg::Button::Ptr ending_button = sfg::Button::Create();
 
@@ -32,18 +34,7 @@ public:
 
 	};
 
-	struct knot{
-		std::string lay = "eny";	
-		sfg::Button::Ptr ending_button = sfg::Button::Create();
-		knot(){
-			sfg::Image::Ptr sfg_image = sfg::Image::Create(texture_manager->sfml_image_map["dot"]);
-			ending_button->SetImage(sfg_image);
-		};
-	};
-	
 	std::vector<ending> vector_endings;
-
-	knot dot;
 
 	sf::Image img;
 	sfg::Image::Ptr image = sfg::Image::Create();
@@ -58,6 +49,7 @@ public:
 	sfg::Box::Ptr voltage_box = sfg::Box::Create();
 	sfg::Box::Ptr indicator_box = sfg::Box::Create();
 	sfg::Box::Ptr delete_box = sfg::Box::Create();
+	sfg::Box::Ptr move_box = sfg::Box::Create();
 
 	sfg::Entry::Ptr resistance_entry = sfg::Entry::Create();
 	sfg::Label::Ptr resistance_label = sfg::Label::Create();
@@ -68,10 +60,12 @@ public:
 	sfg::Label::Ptr indicator_label = sfg::Label::Create();
 
 	sfg::Button::Ptr delete_button = sfg::Button::Create();
+	sfg::Button::Ptr move_button = sfg::Button::Create();
 
 	virtual void setImage() = 0;
-	virtual void init_endings() = 0;
+	virtual void init_endings() = 0;;
 };
+
 
 class Wire{
 public:
@@ -80,8 +74,12 @@ public:
 	int id;
 	int first_other_id = -1;
 	int second_other_id = -1;
+		
+	int first_other_ending_id = -1;	
+	int second_other_ending_id = -1;		
 	sf::VertexArray wire;
 };
+
 
 class Lamp : public Element{
 public:
@@ -118,11 +116,12 @@ public:
 
 class Knot : public Element{
 public:
-	Knot();
+	Knot(){}
 	~Knot();
     void draw();
-	void setImage() = 0;
+	void setImage();
 	std::string getType();
+	void init_endings();
 };
 
 class Ampermeter : public Element{

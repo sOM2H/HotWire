@@ -38,6 +38,7 @@ void Hotwire::init(){
 			desktop.BringToFront(sfgui_window);	
 			desktop.BringToFront(sfgui_window_bar);
 		}
+		element_id = 0;
 	});
 
 	
@@ -53,13 +54,14 @@ void Hotwire::init(){
     auto image_lamp = sfg::Image::Create();
 
     std::string images[] = {
-	"lamp", "battery", "resistor", "ampermeter", "voltmeter", "bell", "coil", "transistor", "switch", "loles", "reostat"
+	"lamp", "battery", "resistor", "ampermeter", "voltmeter", "bell", "coil", "transistor", "switch", "loles", "reostat", "dot"
     };
 
     for (const std::string & name : images) {
 		init_image(name);
     }
 
+    image_map["dot"]->GetSignal(sfg::Image::OnMouseLeftPress).Connect([&buffer_ref]{buffer_ref = "dot"; std::cout << "buffer: dot\n";});
     image_map["lamp"]->GetSignal(sfg::Image::OnMouseLeftPress).Connect([&buffer_ref]{buffer_ref = "lamp"; std::cout << "buffer: lamp\n";});
     image_map["battery"]->GetSignal(sfg::Image::OnMouseLeftPress).Connect([&buffer_ref]{buffer_ref = "battery"; std::cout << "buffer: battery\n";});
     image_map["resistor"]->GetSignal(sfg::Image::OnMouseLeftPress).Connect([&buffer_ref]{buffer_ref = "resistor"; std::cout << "buffer: resistor\n";});
@@ -75,7 +77,7 @@ void Hotwire::init(){
 		std::cout << "********************\n";
 	    std::cout << "^ Click on window. ^\n";
 		std::cout << "********************\n\n";
-	    element_making(buffer_ref, sf::Vector2i(mouse.getPosition(render_window).x, mouse.getPosition(render_window).y), amountOfBatteries, element_id);
+	    element_making(buffer_ref, sf::Vector2i(mouse.getPosition(render_window).x, mouse.getPosition(render_window).y));
 	});
 
     sfgui_window->GetSignal(sfg::Window::OnMouseLeftPress).Connect([&]{
@@ -84,6 +86,7 @@ void Hotwire::init(){
 
 
 	boxIN->Pack(clear_button);
+	boxIN->Pack(image_map["dot"]);
     boxIN->Pack(image_map["lamp"]);
     boxIN->Pack(image_map["resistor"]);
     boxIN->Pack(image_map["battery"]);
@@ -183,9 +186,12 @@ void Hotwire::update(){
 	}
 	for (auto & p : element_map) {
 		element_map[p.first]->throughput = false;
-		if(p.second->getType() == "battery"){
-			current_bypass(p.first);
+		if(p.second->getType() == "battery" && !p.second->visited){
+			search_circuid(p.first);
 		}
+	}
+	for(auto p : element_map) {
+		p.second->visited = false;
 	}
 }
 
@@ -211,13 +217,12 @@ std::ostream & operator<<(std::ostream & os, sf::FloatRect vec) {
 }
 
 
-int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatteries, int &id){
+int Hotwire::element_making(std::string name, sf::Vector2i pos){
 	if(elements_position_set.count( std::make_pair( ((pos.x/60))*60, ((pos.y/60))*60 )) > 0){
 			return 0;
 	}
 
 	
-	id++;
 	Element * temp;
 
 		if(name == "lamp"){		
@@ -254,7 +259,6 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 
 	}else if(name == "battery"){
 
-		amountOfBatteries++;
 		temp = new Battery;
 
 		temp->voltage_label->SetText("Voltage");
@@ -276,7 +280,7 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 
 		auto & voltage_entry_ref = temp->voltage_entry;
 
-		temp->option_window_ok->GetSignal(sfg::Widget::OnLeftClick ).Connect([&, tempid = id]{
+		temp->option_window_ok->GetSignal(sfg::Widget::OnLeftClick ).Connect([&, tempid = element_id]{
 				voltage_entry_ref->SetText(regex_string(voltage_entry_ref->GetText()));
 				desktop.BringToFront(sfgui_window);
 				desktop.BringToFront(sfgui_window_bar);
@@ -440,9 +444,13 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 	} else if(name == "switch"){
 
 		temp = new Switch;
-		temp->option_window->SetTitle("Option window: Switch");
+		temp->option_window->SetTitle("Option window: Switch");	
+		temp->option_window->Add(temp->option_window_box);
 
-	
+	} else if(name == "dot"){
+
+		temp = new Knot;
+		temp->option_window->SetTitle("Option window: Knot");	
 		temp->option_window->Add(temp->option_window_box);
 
 	} else if(name == "reostat"){
@@ -453,12 +461,13 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 		return 0;		
 	}
 
-	
+		element_id++;
+
 		temp->delete_button->SetLabel("Delete");
 
 		temp->delete_button->SetRequisition(sf::Vector2f(300, 30));
 
-		temp->delete_button->GetSignal(sfg::Widget::OnLeftClick ).Connect([&, tempid = id]{
+		temp->delete_button->GetSignal(sfg::Widget::OnLeftClick ).Connect([&, tempid = element_id]{
 				element_delete(tempid);
 				desktop.BringToFront(sfgui_window);
 				desktop.BringToFront(sfgui_window_bar);
@@ -476,8 +485,8 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 
 	elements_position_set.insert(std::make_pair( ((pos.x/60))*60, ((pos.y/60))*60 ));
 
-	temp->id = id;
-    element_map[id] = temp;
+	temp->id = element_id;
+    element_map[temp->id] = temp;
 
 	temp->setImage();
 	temp->init_endings();
@@ -486,10 +495,10 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 	temp->option_window->SetPosition(sf::Vector2f(temp->x + 30, temp->y + 30));
 
 
-	desktop.Add(element_map[id]->option_window);
-	temp->image->GetSignal(sfg::Image::OnMouseRightPress).Connect([&, id]{
-				desktop.BringToFront(element_map[id]->option_window);
-				element_map[id]->option_window->SetPosition(sf::Vector2f(element_map[id]->x + 30, element_map[id]->y + 30));
+	desktop.Add(element_map[element_id]->option_window);
+	temp->image->GetSignal(sfg::Image::OnMouseRightPress).Connect([&, element_id_ref = element_id]{
+				desktop.BringToFront(element_map[element_id_ref]->option_window);
+				element_map[element_id_ref]->option_window->SetPosition(sf::Vector2f(element_map[element_id_ref]->x + 30, element_map[element_id_ref]->y + 30));
 
 		});
 
@@ -503,19 +512,22 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 	int & index_S_E_B_ref = index_S_E_B;
 	
 	for(int i = 0; i < temp->vector_endings.size(); ++i){
-		temp->vector_endings[i].ending_button->GetSignal(sfg::Widget::OnLeftClick).Connect([&, tempid = temp->id, i, this]{
-			if(bufferFirstElement_ref == -1){
-				bufferFirstElement_ref = tempid;
-				index_F_E_B_ref = i;
-	
-			}else if(tempid != bufferFirstElement_ref){
-				bufferSecondElement_ref = tempid;
-				index_S_E_B_ref = i;
-			}
-			if(bufferFirstElement_ref != -1 && bufferSecondElement_ref != -1){
-				wire_making(bufferFirstElement_ref, bufferSecondElement_ref, index_F_E_B_ref, index_S_E_B_ref);
-			}
-		});
+		temp->vector_endings[i].ending_button->GetSignal(sfg::Widget::OnLeftClick).Connect([&, tempid = temp->id, i, temp_ref = temp, this]{
+		if(temp_ref->vector_endings[i].wire_id != -1){
+				wire_delete(temp_ref->vector_endings[i].wire_id);
+			}else{
+				if(bufferFirstElement_ref == -1){
+					bufferFirstElement_ref = tempid;
+					index_F_E_B_ref = i;
+		
+				}else if(tempid != bufferFirstElement_ref){
+					bufferSecondElement_ref = tempid;
+					index_S_E_B_ref = i;
+				}
+				if(bufferFirstElement_ref != -1 && bufferSecondElement_ref != -1){
+					wire_making(bufferFirstElement_ref, bufferSecondElement_ref, index_F_E_B_ref, index_S_E_B_ref);
+				}
+			}});
 
 	}
 
@@ -537,6 +549,8 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos, int amountOfBatt
 			fixed->Put( temp->vector_endings[i].ending_button, sf::Vector2f(temp->x + 60 - 3 - 5, temp->y + 30 - 3 - 5));
 		if(temp->vector_endings[i].lay == "down")
 			fixed->Put( temp->vector_endings[i].ending_button, sf::Vector2f(temp->x + 30 - 3 - 5, temp->y + 60 - 3 - 5));
+		if(temp->vector_endings[i].lay == "up")
+			fixed->Put( temp->vector_endings[i].ending_button, sf::Vector2f(temp->x + 30 - 3 - 5, temp->y  - 3 - 5));
 	}	
 	desktop.BringToFront(sfgui_window_bar);
 }
@@ -565,8 +579,8 @@ int Hotwire::wire_making(int b1, int b2, int I_F_E_B, int I_S_E_B){
 			temp_wire->wire.append(sf::Vertex(
 					sf::Vector2f(
 						element_map[b1]->vector_endings[I_F_E_B].ending_button->GetAllocation().left + 5
-						- (element_map[b1]->vector_endings[I_F_E_B].ending_button->GetAllocation().left + 5 - 
-							element_map[b2]->vector_endings[I_S_E_B].ending_button->GetAllocation().left + 5)/2,
+						- ((element_map[b1]->vector_endings[I_F_E_B].ending_button->GetAllocation().left + 5) - 
+							(element_map[b2]->vector_endings[I_S_E_B].ending_button->GetAllocation().left + 5))/2,
 
 						element_map[b1]->vector_endings[I_F_E_B].ending_button->GetAllocation().top + 5),
 				sf::Color::Yellow));
@@ -574,8 +588,8 @@ int Hotwire::wire_making(int b1, int b2, int I_F_E_B, int I_S_E_B){
 			temp_wire->wire.append(sf::Vertex(
 					sf::Vector2f(	
 						element_map[b1]->vector_endings[I_F_E_B].ending_button->GetAllocation().left + 5
-						- (element_map[b1]->vector_endings[I_F_E_B].ending_button->GetAllocation().left + 5 - 
-							element_map[b2]->vector_endings[I_S_E_B].ending_button->GetAllocation().left + 5)/2,
+						- ((element_map[b1]->vector_endings[I_F_E_B].ending_button->GetAllocation().left + 5) - 
+							(element_map[b2]->vector_endings[I_S_E_B].ending_button->GetAllocation().left + 5))/2,
 
 						element_map[b2]->vector_endings[I_S_E_B].ending_button->GetAllocation().top + 5),
 				sf::Color::Yellow));
@@ -604,9 +618,8 @@ int Hotwire::wire_making(int b1, int b2, int I_F_E_B, int I_S_E_B){
 						element_map[b1]->vector_endings[I_F_E_B].ending_button->GetAllocation().left + 5,
 
 						element_map[b1]->vector_endings[I_F_E_B].ending_button->GetAllocation().top + 5 - 
-						(element_map[b1]->vector_endings[I_F_E_B].ending_button->GetAllocation().top + 5 -
-							element_map[b2]->vector_endings[I_S_E_B].ending_button->GetAllocation().top + 5 
-							)/2),
+						((element_map[b1]->vector_endings[I_F_E_B].ending_button->GetAllocation().top + 5) -
+							(element_map[b2]->vector_endings[I_S_E_B].ending_button->GetAllocation().top + 5))/2),
 				sf::Color::Yellow));
 
 			temp_wire->wire.append(sf::Vertex(
@@ -614,9 +627,8 @@ int Hotwire::wire_making(int b1, int b2, int I_F_E_B, int I_S_E_B){
 						element_map[b2]->vector_endings[I_S_E_B].ending_button->GetAllocation().left + 5,
 
 						element_map[b1]->vector_endings[I_F_E_B].ending_button->GetAllocation().top + 5 - 
-						(element_map[b1]->vector_endings[I_F_E_B].ending_button->GetAllocation().top + 5 -
-							element_map[b2]->vector_endings[I_S_E_B].ending_button->GetAllocation().top + 5 
-							)/2),
+						((element_map[b1]->vector_endings[I_F_E_B].ending_button->GetAllocation().top + 5) -
+							(element_map[b2]->vector_endings[I_S_E_B].ending_button->GetAllocation().top + 5))/2),
 				sf::Color::Yellow));
 
 
@@ -635,11 +647,18 @@ int Hotwire::wire_making(int b1, int b2, int I_F_E_B, int I_S_E_B){
 			element_map[b1]->vector_endings[I_F_E_B].other_element_id = b2;
 			element_map[b2]->vector_endings[I_S_E_B].other_element_id = b1;
 
-			element_map[b1]->vector_endings[I_F_E_B].wire_id_ = wire_id;
-			element_map[b2]->vector_endings[I_S_E_B].wire_id_ = wire_id;
+			element_map[b1]->vector_endings[I_F_E_B].wire_id = wire_id;
+			element_map[b2]->vector_endings[I_S_E_B].wire_id = wire_id;
 
 			temp_wire->first_other_id = b1;
 			temp_wire->second_other_id = b2;
+
+
+			element_map[b1]->vector_endings[I_F_E_B].other_element_ending_id = I_S_E_B;
+			element_map[b2]->vector_endings[I_S_E_B].other_element_ending_id = I_F_E_B;
+
+			temp_wire->first_other_ending_id = I_F_E_B;
+			temp_wire->second_other_ending_id = I_S_E_B;
 
 
 			temp_wire->wire.setPrimitiveType ( sf::LinesStrip ) ;
@@ -656,11 +675,6 @@ int Hotwire::wire_making(int b1, int b2, int I_F_E_B, int I_S_E_B){
 }
 
 
-sf::Vector2i Hotwire::couting_amountImage(int ws_w, int ws_h, int img_s){
-	int w = ws_w/img_s;
-	int h = ws_h/img_s;
-	return sf::Vector2i(w, h);
-}
 
 std::string Hotwire::regex_string(std::string string){
 	bool dot = false;
@@ -693,23 +707,15 @@ int Hotwire::element_delete(int id){
 			std::cout<< "temp_id = " <<temp_id << "\n";
 			for(int j = 0; j < element_map[temp_id]->vector_endings.size(); ++j){
 				if(element_map[temp_id]->vector_endings[j].other_element_id == id){
-					auto it = std::find(vector_wires.begin(), vector_wires.end(), std::make_pair(temp_id, id));
-					while (it != vector_wires.end()) {
-						vector_wires.erase(it);
-						it = std::find(vector_wires.begin(), vector_wires.end(), std::make_pair(temp_id, id));
-					}
-					it = std::find(vector_wires.begin(), vector_wires.end(), std::make_pair(id, temp_id));
-					while (it != vector_wires.end()) {
-						vector_wires.erase(it);
-						it = std::find(vector_wires.begin(), vector_wires.end(), std::make_pair(id, temp_id));
-					}
-
 					element_map[temp_id]->vector_endings[j].other_element_id = -1;
 					element_map[id]->vector_endings[i].other_element_id	= -1;
 
-					map_draw_wire.erase(element_map[id]->vector_endings[i].wire_id_);
-					map_draw_wire.erase(element_map[temp_id]->vector_endings[j].wire_id_);
-					std::cout<< "element_map[id]->vector_endings[i].wire_id_ = " << element_map[id]->vector_endings[i].wire_id_ << "\n";
+					element_map[temp_id]->vector_endings[j].other_element_ending_id = -1;
+					element_map[id]->vector_endings[i].other_element_ending_id = -1;
+
+					wire_delete(element_map[id]->vector_endings[i].wire_id);
+				
+					std::cout<< "element_map[id]->vector_endings[i].wire_id_ = " << element_map[id]->vector_endings[i].wire_id << "\n";
 					std::cout<<"map_draw_wire.size(): "<< map_draw_wire.size() << "\n";
 				}
 			}
@@ -728,79 +734,48 @@ int Hotwire::element_delete(int id){
 	fixed->Remove(element_map[id]->image);
 	element_map.erase(id);
 
+
 	bufferFirstElement = -1;
 	bufferSecondElement = -1;
 }
 
-int Hotwire::current_bypass(int id){
-	int temp_id;
-	for(int i = 0; i < element_map[id]->vector_endings.size(); ++i){
-			for(int j = 0; j < 4; ++j){
-			//	wires_map[ element_map[ id ]->vector_endings[i].wire_id_]->wire[j].color = sf::Color::Yellow;
-			}
-		if(element_map[id]->vector_endings[i].other_element_id != -1){
-			temp_id = element_map[id]->vector_endings[i].other_element_id;
-			for(int j = 0; j < 4; ++j){
-				wires_map[ element_map[ id ]->vector_endings[i].wire_id_]->wire[j].color = sf::Color::Red;
-			}
-			if(element_map[temp_id]->getType() != "battery" && element_map[temp_id]->getType() != "voltmeter"){
-				element_map[ temp_id ]->throughput = true;
-				current_bypass2(temp_id, id);
+int Hotwire::wire_delete(int id){
+	element_map[ wires_map[id]->first_other_id ]->vector_endings[ wires_map[id]->first_other_ending_id ].other_element_id = -1;
+	element_map[ wires_map[id]->second_other_id ]->vector_endings[ wires_map[id]->second_other_ending_id ].other_element_id = -1;
+
+	element_map[ wires_map[id]->first_other_id ]->vector_endings[ wires_map[id]->first_other_ending_id ].wire_id = -1;
+	element_map[ wires_map[id]->second_other_id ]->vector_endings[ wires_map[id]->second_other_ending_id ].wire_id = -1;
+
+	element_map[ wires_map[id]->first_other_id ]->vector_endings[ wires_map[id]->first_other_ending_id ].other_element_ending_id = -1;
+	element_map[ wires_map[id]->second_other_id ]->vector_endings[ wires_map[id]->second_other_ending_id ].other_element_ending_id = -1;
+
+	map_draw_wire.erase(id);
+
+	bufferFirstElement = -1;
+	bufferSecondElement = -1;
+}
+
+int Hotwire::search_circuid(int id){	
+	if(element_map[id]->vector_endings[0].other_element_id != -1){
+		std::cout<<" dfs( "<< element_map[id]->vector_endings[0].other_element_id << ", " << id << ", "<< "0" << "); \n\n"; 
+		dfs(element_map[id]->vector_endings[0].other_element_id, id, 0);
+	}
+	
+}
+
+
+int Hotwire::dfs(int id, int before_id, int before_ending_id){
+	if(!element_map[id]->visited){
+		element_map[id]->visited = true;
+		for(int i = 0; i < element_map[id]->vector_endings.size(); ++i){
+			if(element_map[id]->vector_endings[i].other_element_id != -1){
+				if(element_map[id]->vector_endings[i].other_element_id != before_id ){
+					std::cout<<" dfs( "<< element_map[id]->vector_endings[i].other_element_id << ", " << id << ", "<< i << "); \n\n"; 
+					dfs(element_map[id]->vector_endings[i].other_element_id, id, i);
+				}
 			}
 		}
 	}
 }
 
 
-int Hotwire::current_bypass2(int id, int id2){
-	int temp_id;
-	for(int i = 0; i < element_map[id]->vector_endings.size(); ++i){	
-		if(element_map[id]->vector_endings[i].other_element_id != -1){
-			temp_id = element_map[id]->vector_endings[i].other_element_id;
-			if((element_map[temp_id]->getType() != "battery") && (temp_id != id2  ) && (element_map[temp_id]->getType() != "voltmeter")){
-				element_map[ temp_id ]->throughput = true;	
-				current_bypass2(temp_id, id);
-			}
-			for(int j = 0; j < 4; ++j){
-				wires_map[ element_map[ id ]->vector_endings[i].wire_id_]->wire[j].color = sf::Color::Red;
-			}
-		}
-	 }
-}
-
-
-int Hotwire::wire_delete(int id){
-	int temp_id = -1;
-	for(int i = 0; i < element_map[id]->vector_endings.size(); ++i){
-		temp_id = element_map[id]->vector_endings[i].other_element_id;
-		if(temp_id != -1){
-			std::cout<< "temp_id = " <<temp_id << "\n";
-			for(int j = 0; j < element_map[temp_id]->vector_endings.size(); ++j){
-				if(element_map[temp_id]->vector_endings[j].other_element_id == id){
-					auto it = std::find(vector_wires.begin(), vector_wires.end(), std::make_pair(temp_id, id));
-					while (it != vector_wires.end()) {
-						vector_wires.erase(it);
-						it = std::find(vector_wires.begin(), vector_wires.end(), std::make_pair(temp_id, id));
-					}
-					it = std::find(vector_wires.begin(), vector_wires.end(), std::make_pair(id, temp_id));
-					while (it != vector_wires.end()) {
-						vector_wires.erase(it);
-						it = std::find(vector_wires.begin(), vector_wires.end(), std::make_pair(id, temp_id));
-					}
-
-					element_map[temp_id]->vector_endings[j].other_element_id = -1;
-					element_map[id]->vector_endings[i].other_element_id	= -1;
-
-					map_draw_wire.erase(element_map[id]->vector_endings[i].wire_id_);
-					map_draw_wire.erase(element_map[temp_id]->vector_endings[j].wire_id_);
-					std::cout<< "element_map[id]->vector_endings[i].wire_id_ = " << element_map[id]->vector_endings[i].wire_id_ << "\n";
-					std::cout<<"map_draw_wire.size(): "<< map_draw_wire.size() << "\n";
-				}
-			}
-			temp_id = -1;
-		}
-	}	
-	
-	bufferFirstElement = -1;
-	bufferSecondElement = -1;
-}

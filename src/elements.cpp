@@ -12,10 +12,24 @@ void Lamp::init_endings(){
 	
 	vector_endings.push_back(ending("left"));
 	vector_endings.push_back(ending("right"));
-
 }
 
 
+void Knot::setImage(){
+if(img.loadFromFile( "src/textures/dot.png" )){
+		printf("Init new image: dot.png\n\n");
+	}
+	image->SetImage(img);
+
+}
+
+void Knot::init_endings(){
+	
+	vector_endings.push_back(ending("left"));
+	vector_endings.push_back(ending("right"));
+	vector_endings.push_back(ending("up"));
+	vector_endings.push_back(ending("down"));
+}
 
 void Battery::setImage(){
 	if(img.loadFromFile( "src/textures/battery.png" )){
