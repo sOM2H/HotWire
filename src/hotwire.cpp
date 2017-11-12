@@ -4,6 +4,7 @@
 #include <SFGUI/FileResourceLoader.hpp>
 #include <iostream>
 #include <algorithm>
+#include <stdlib.h>
 
 Hotwire::Hotwire()
 	/*: render_window(sf::VideoMode(800, 600), "HotWire", 5)*/
@@ -17,15 +18,70 @@ void Hotwire::init(){
     render_window.resetGLStates();
     state = "menu";
 ///////
-	
+
+	std::string images[] = {
+	"lamp", "battery", "resistor", "ampermeter", "voltmeter", "bell", "coil", "transistor", "switch", "loles", "reostat", "dot", "start", "exit", "tests"
+    };
+
+    for (const std::string & name : images) {
+		init_image(name);
+    }
+
+
     sfgui_window_menu->SetStyle(sfg::Window::Style::BACKGROUND);
+	sfgui_window_tests->SetStyle(sfg::Window::Style::BACKGROUND);
 
 	sfgui_window_menu->SetRequisition(sf::Vector2f(SFGUI_WS_W + 22, SFGUI_WS_H + 22));
 	sfgui_window_menu->SetPosition(sf::Vector2f(-11, -11));
 
-	Start->SetLabel("Start");
-	Start->SetRequisition(sf::Vector2f(300, 100));
-	fixed_menu->Put(Start, sf::Vector2f());
+	sfgui_window_tests->SetRequisition(sf::Vector2f(SFGUI_WS_W + 22, SFGUI_WS_H + 22));
+	sfgui_window_tests->SetPosition(sf::Vector2f(-11, -11));
+
+	test3->SetLabel("test 3");
+	test3->SetRequisition(sf::Vector2f());
+	fixed_tests->Put(test3, sf::Vector2f(100, 100));
+
+	test3->GetSignal(sfg::Widget::OnLeftClick ).Connect([&]{
+		#ifdef __windows
+		system("start https://docs.google.com/forms/d/e/1FAIpQLSdHLbhNACd_BLx5kzW5miylS2i2VIrAbTLFx7IMT2ykSXTPmQ/viewform");
+		#endif
+		#ifdef __linux
+		system("xdg-open https://docs.google.com/forms/d/e/1FAIpQLSdHLbhNACd_BLx5kzW5miylS2i2VIrAbTLFx7IMT2ykSXTPmQ/viewform");
+		#endif
+	});
+
+
+	test2->SetLabel("test 2");
+	test2->SetRequisition(sf::Vector2f());
+	fixed_tests->Put(test2, sf::Vector2f(100, 200));
+
+	test2->GetSignal(sfg::Widget::OnLeftClick ).Connect([&]{
+			
+		#ifdef __windows
+		system("start https://docs.google.com/forms/d/e/1FAIpQLSdckzc8XYnGRex6ZrLZpIcWOeV0n5LVs9aRGyv6GGXuF_o8bg/viewform");
+		#endif
+		#ifdef __linux
+		system("xdg-open https://docs.google.com/forms/d/e/1FAIpQLSdckzc8XYnGRex6ZrLZpIcWOeV0n5LVs9aRGyv6GGXuF_o8bg/viewform");
+		#endif
+	});
+
+	test1->SetLabel("test 1");
+	test1->SetRequisition(sf::Vector2f());
+	fixed_tests->Put(test1, sf::Vector2f(100, 300));
+
+	test1->GetSignal(sfg::Widget::OnLeftClick ).Connect([&]{
+			
+		#ifdef __windows
+		system("start https://docs.google.com/forms/d/1VO2b0hD3EgKVc0vJ7L0sn9SWkGqAGFIBHREkaVivhiY/edit?fbzx=-1838048315125321500");
+		#endif
+		#ifdef __linux
+		system("xdg-open https://docs.google.com/forms/d/1VO2b0hD3EgKVc0vJ7L0sn9SWkGqAGFIBHREkaVivhiY/edit?fbzx=-1838048315125321500");
+		#endif
+	});
+
+	Start->SetImage(image_map["start"]);
+	Start->SetRequisition(sf::Vector2f());
+	fixed_menu->Put(Start, sf::Vector2f(100, 100));
 
 	Start->GetSignal(sfg::Widget::OnLeftClick ).Connect([&]{
 			desktop.BringToFront(sfgui_window);	
@@ -33,7 +89,28 @@ void Hotwire::init(){
 			state = "programm";
 	});
 
-	sfgui_window_menu->Add(fixed);
+	Tests->SetImage(image_map["tests"]);
+	Tests->SetRequisition(sf::Vector2f());
+	fixed_menu->Put(Tests, sf::Vector2f(100, 400));
+
+
+	Tests->GetSignal(sfg::Widget::OnLeftClick ).Connect([&]{
+			desktop.BringToFront(sfgui_window_tests);
+			state = "tests";
+			});
+
+	Exit->SetImage(image_map["exit"]);
+	Exit->SetRequisition(sf::Vector2f());
+	fixed_menu->Put(Exit, sf::Vector2f(100, 700));
+
+	Exit->GetSignal(sfg::Widget::OnLeftClick ).Connect([&]{
+			running = false;
+	});
+
+
+	sfgui_window_tests->Add(fixed_tests);
+	sfgui_window_menu->Add(fixed_menu);
+	desktop.Add(sfgui_window_tests);
 	desktop.Add(sfgui_window_menu);
 
 /////////
@@ -72,14 +149,6 @@ void Hotwire::init(){
  
     auto image_lamp = sfg::Image::Create();
 
-    std::string images[] = {
-	"lamp", "battery", "resistor", "ampermeter", "voltmeter", "bell", "coil", "transistor", "switch", "loles", "reostat", "dot"
-    };
-
-    for (const std::string & name : images) {
-		init_image(name);
-    }
-
     image_map["dot"]->GetSignal(sfg::Image::OnMouseLeftPress).Connect([&buffer_ref]{buffer_ref = "dot"; std::cout << "buffer: dot\n";});
     image_map["lamp"]->GetSignal(sfg::Image::OnMouseLeftPress).Connect([&buffer_ref]{buffer_ref = "lamp"; std::cout << "buffer: lamp\n";});
     image_map["battery"]->GetSignal(sfg::Image::OnMouseLeftPress).Connect([&buffer_ref]{buffer_ref = "battery"; std::cout << "buffer: battery\n";});
@@ -97,6 +166,7 @@ void Hotwire::init(){
 	    std::cout << "^ Click on window. ^\n";
 		std::cout << "********************\n\n";
 	    element_making(buffer_ref, sf::Vector2i(mouse.getPosition(render_window).x, mouse.getPosition(render_window).y));
+		desktop.BringToFront(sfgui_window_bar);
 	});
 
     sfgui_window->GetSignal(sfg::Window::OnMouseRightPress).Connect([&]{
@@ -132,7 +202,8 @@ void Hotwire::init(){
 	desktop.Add( sfgui_window_bar);
 
 	desktop.BringToFront( sfgui_window);
-	//desktop.BringToFront( sfgui_window_menu);
+	desktop.BringToFront(sfgui_window_bar);
+	desktop.BringToFront( sfgui_window_menu);
 
     running = true;
 	
@@ -164,24 +235,29 @@ void Hotwire::handle_events(){
         if(event.type == sf::Event::Closed || event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape){
 			if(state == "menu"){
             	running = false;
-			}else if(state == "about"){
+			}else if(state == "tests"){
 				desktop.BringToFront(sfgui_window_menu);
-			}else if(state == " programm"){	
+				state = "menu";
+			}else if(state == "programm"){	
 				desktop.BringToFront(sfgui_window_menu);
+				state = "menu";
 			}
 		}
 
 		if(event.type == sf::Event::KeyPressed){
 			if(event.key.code == sf::Keyboard::Space){		
-					//sfgui_window_bar->SetPosition(sf::Vector2f(pos_bar.x, pos_bar.y));
-					pos_bar.x = sfgui_window_bar->GetAllocation().left;
-					pos_bar.y = sfgui_window_bar->GetAllocation().top;
-					desktop.BringToFront(sfgui_window_bar);
+					if(state == "programm"){
+						pos_bar.x = sfgui_window_bar->GetAllocation().left;
+						pos_bar.y = sfgui_window_bar->GetAllocation().top;
+						desktop.BringToFront(sfgui_window_bar);
+					}
 				
 			}
 			if(event.key.code == sf::Keyboard::Tab){
-					sfgui_window_bar->SetPosition(sf::Vector2f(0 ,0));
-					desktop.BringToFront(sfgui_window_bar);
+					if(state == "programm"){
+						sfgui_window_bar->SetPosition(sf::Vector2f(0 ,0));
+						desktop.BringToFront(sfgui_window_bar);
+					}
 			}
 		}
 
@@ -949,5 +1025,6 @@ int Hotwire::move(int id){
 	fixed->Remove(element_map[id]->image);
 	fixed->Put(element_map[id]->image, sf::Vector2f(element_map[id]->x, element_map[id]->y));
 	elements_position_set.insert(std::make_pair( ((element_map[id]->x/60))*60, ((element_map[id]->y/60))*60 ));
+	moving = 0;
 }
 

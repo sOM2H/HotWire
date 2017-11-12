@@ -34,9 +34,23 @@ class Hotwire{
 
 		sfg::Window::Ptr sfgui_window = sfg::Window::Create();
 		sfg::Window::Ptr sfgui_window_bar = sfg::Window::Create(sfg::Window::Style::TITLEBAR | sfg::Window::Style::BACKGROUND);
-
+///
 		sfg::Window::Ptr sfgui_window_menu = sfg::Window::Create();
-		sfg::Window::Ptr sfgui_window_pause = sfg::Window::Create();
+
+		sfg::Button::Ptr Start = sfg::Button::Create();
+		sfg::Button::Ptr About = sfg::Button::Create();
+		sfg::Button::Ptr Tests = sfg::Button::Create();
+		sfg::Button::Ptr Exit = sfg::Button::Create();
+
+		sfg::Button::Ptr test1 = sfg::Button::Create();
+		sfg::Button::Ptr test2 = sfg::Button::Create();
+		sfg::Button::Ptr test3 = sfg::Button::Create();
+
+		sfg::Fixed::Ptr fixed_menu = sfg::Fixed::Create();
+		sfg::Fixed::Ptr fixed_tests = sfg::Fixed::Create();
+///
+		sfg::Window::Ptr sfgui_window_tests = sfg::Window::Create();
+
 		sfg::Window::Ptr sfgui_window_about= sfg::Window::Create();
 
 
@@ -44,6 +58,7 @@ class Hotwire{
 
 		sf::Vector2f pos_bar;
 
+		std::string state = "none";
 
 		struct edge{
 			int begin_id;
