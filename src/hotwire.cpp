@@ -15,17 +15,36 @@ Hotwire::Hotwire()
 void Hotwire::init(){
 
     render_window.resetGLStates();
-
-
-    box->Pack(boxIN, false, false);
+    state = "menu";
+///////
 	
+    sfgui_window_menu->SetStyle(sfg::Window::Style::BACKGROUND);
+
+	sfgui_window_menu->SetRequisition(sf::Vector2f(SFGUI_WS_W + 22, SFGUI_WS_H + 22));
+	sfgui_window_menu->SetPosition(sf::Vector2f(-11, -11));
+
+	Start->SetLabel("Start");
+	Start->SetRequisition(sf::Vector2f(300, 100));
+	fixed_menu->Put(Start, sf::Vector2f());
+
+	Start->GetSignal(sfg::Widget::OnLeftClick ).Connect([&]{
+			desktop.BringToFront(sfgui_window);	
+			desktop.BringToFront(sfgui_window_bar);
+			state = "programm";
+	});
+
+	sfgui_window_menu->Add(fixed);
+	desktop.Add(sfgui_window_menu);
+
+/////////
+    box->Pack(boxIN, false, false);
 	sfgui_window_bar->SetRequisition(sf::Vector2f(0, 270));
 	sfgui_window_bar->SetAllocation(sf::FloatRect(0, 0, 60, 270));
 	sfgui_window_bar->SetPosition(sf::Vector2f(0.f, 0.f));
 	sfgui_window_bar->SetTitle("Bar");
  		
 	sfgui_window_bar->SetPosition(sf::Vector2f(0, 0));
-
+		
 
 
 	clear_button->SetLabel("Clear Map");
@@ -113,6 +132,7 @@ void Hotwire::init(){
 	desktop.Add( sfgui_window_bar);
 
 	desktop.BringToFront( sfgui_window);
+	//desktop.BringToFront( sfgui_window_menu);
 
     running = true;
 	
@@ -142,7 +162,13 @@ void Hotwire::handle_events(){
     sf::Event event;
     while (render_window.pollEvent(event)){
         if(event.type == sf::Event::Closed || event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape){
-            running = false;
+			if(state == "menu"){
+            	running = false;
+			}else if(state == "about"){
+				desktop.BringToFront(sfgui_window_menu);
+			}else if(state == " programm"){	
+				desktop.BringToFront(sfgui_window_menu);
+			}
 		}
 
 		if(event.type == sf::Event::KeyPressed){
@@ -720,24 +746,32 @@ std::string Hotwire::regex_string(std::string string){
 
 int Hotwire::element_delete(int id){
 	int temp_id = -1;
+
+	int wire_id;
+
+	int first_id;
+	int second_id;
+
+	int first_ending_id;
+	int second_ending_id;
+
+
 	for(int i = 0; i < element_map[id]->vector_endings.size(); ++i){
 		temp_id = element_map[id]->vector_endings[i].other_element_id;
 		if(temp_id != -1){
-			std::cout<< "temp_id = " <<temp_id << "\n";
-			for(int j = 0; j < element_map[temp_id]->vector_endings.size(); ++j){
-				if(element_map[temp_id]->vector_endings[j].other_element_id == id){
-					element_map[temp_id]->vector_endings[j].other_element_id = -1;
-					element_map[id]->vector_endings[i].other_element_id	= -1;
+			wire_id = element_map[id]->vector_endings[i].wire_id;
 
-					element_map[temp_id]->vector_endings[j].other_element_ending_id = -1;
-					element_map[id]->vector_endings[i].other_element_ending_id = -1;
+			first_id = wires_map[wire_id]->first_other_id;
+			second_id = wires_map[wire_id]->second_other_id;
 
-					wire_delete(element_map[id]->vector_endings[i].wire_id);
-				
-					std::cout<< "element_map[id]->vector_endings[i].wire_id_ = " << element_map[id]->vector_endings[i].wire_id << "\n";
-					std::cout<<"map_draw_wire.size(): "<< map_draw_wire.size() << "\n";
-				}
-			}
+			first_ending_id = wires_map[wire_id]->first_other_ending_id;
+			second_ending_id = wires_map[wire_id]->second_other_ending_id;
+
+			wire_delete(wire_id);
+		
+			std::cout<< "element_map[id]->vector_endings[i].wire_id_ = " << element_map[id]->vector_endings[i].wire_id << "\n";
+			std::cout<<"map_draw_wire.size(): "<< map_draw_wire.size() << "\n";
+
 			temp_id = -1;
 		}
 
@@ -759,6 +793,7 @@ int Hotwire::element_delete(int id){
 }
 
 int Hotwire::wire_delete(int id){
+
 	element_map[ wires_map[id]->first_other_id ]->vector_endings[ wires_map[id]->first_other_ending_id ].other_element_id = -1;
 	element_map[ wires_map[id]->second_other_id ]->vector_endings[ wires_map[id]->second_other_ending_id ].other_element_id = -1;
 
