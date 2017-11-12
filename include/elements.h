@@ -13,13 +13,13 @@ int  x;
 	int id;
 	float amperage = 0;
 	bool throughput = false;
-	bool visited = false;
 	virtual void draw() = 0;
 	virtual std::string getType() = 0;
 
 	struct ending{
 		int other_element_id = -1;
 		int other_element_ending_id = -1;
+		bool visited = false;
 		int wire_id = -1;
 		std::string lay = "none";
 		sfg::Button::Ptr ending_button = sfg::Button::Create();
@@ -63,7 +63,9 @@ int  x;
 	sfg::Button::Ptr move_button = sfg::Button::Create();
 
 	virtual void setImage() = 0;
-	virtual void init_endings() = 0;;
+	virtual void init_endings() = 0;
+	float voltage = 0;
+    float resistance = 0;
 };
 
 
@@ -83,9 +85,11 @@ public:
 
 class Lamp : public Element{
 public:
-	Lamp(){}
+	Lamp()
+	{
+		resistance = 1;
+	}
 	~Lamp();
-    float resistance = 0;
     void draw();	
 	void setImage();
 	std::string getType();	
@@ -94,9 +98,10 @@ public:
 
 class Resistor : public Element{
 public:
-	Resistor(){}
+	Resistor(){
+		resistance = 2;
+	}
 	~Resistor();
-    float resistance = 0;
     void draw();
 	void setImage();
 	std::string getType();
@@ -105,10 +110,11 @@ public:
 
 class Battery : public Element{
 public:
-	Battery(){}
+	Battery(){
+		voltage = 5;
+	}
 	~Battery();
     void draw();
-	float voltage = 0;
 	void setImage();
 	std::string getType();
 	void init_endings();
@@ -148,9 +154,10 @@ public:
 
 class Bell : public Element{
 public:
-	Bell(){}
+	Bell(){
+		resistance = 1;
+	}
 	~Bell();
-    float resistance = 0;
     void draw();
 	void setImage();
 	std::string getType();
@@ -162,7 +169,6 @@ class Coil : public Element{
 public:
 	Coil(){}
 	~Coil();
-    float resistance = 0;
     void draw();
 	void setImage();
 	std::string getType();
@@ -174,7 +180,6 @@ class Transistor : public Element{
 public:
 	Transistor(){}
 	~Transistor();
-    float resistance = 0;
     void draw();
 	void setImage();
 	std::string getType();
@@ -185,7 +190,6 @@ class Switch : public Element{
 public:
 	Switch(){}
 	~Switch();
-    float resistance = 0;
     void draw();
 	bool state = true;
 	void setImage();
@@ -197,7 +201,6 @@ class Reostat : public Element{
 public:
 	Reostat(){}
 	~Reostat();
-    float resistance = 0;
     void draw();
 	void setImage();
 	std::string getType();

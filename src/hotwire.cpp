@@ -6,8 +6,8 @@
 #include <algorithm>
 
 Hotwire::Hotwire()
-	: render_window(sf::VideoMode(800, 600), "HotWire", 5)
-	/*: render_window(sf::VideoMode(0, 0), "HotWire", sf::Style::Fullscreen)*/ {
+	/*: render_window(sf::VideoMode(800, 600), "HotWire", 5)*/
+	: render_window(sf::VideoMode(0, 0), "HotWire", sf::Style::Fullscreen) {
 	render_window.setKeyRepeatEnabled(false);
 }
 
@@ -80,8 +80,12 @@ void Hotwire::init(){
 	    element_making(buffer_ref, sf::Vector2i(mouse.getPosition(render_window).x, mouse.getPosition(render_window).y));
 	});
 
-    sfgui_window->GetSignal(sfg::Window::OnMouseLeftPress).Connect([&]{
-		desktop.BringToFront(sfgui_window_bar);
+    sfgui_window->GetSignal(sfg::Window::OnMouseRightPress).Connect([&]{
+		if(!moving){
+			desktop.BringToFront(sfgui_window_bar);
+		}else{
+			move(moving);
+		}
 	});
 
 
@@ -185,13 +189,23 @@ void Hotwire::update(){
 		}
 	}
 	for (auto & p : element_map) {
+		int temp_i  = 0;
 		element_map[p.first]->throughput = false;
-		if(p.second->getType() == "battery" && !p.second->visited){
-			search_circuid(p.first);
+		if(p.second->getType() == "knot"){
+			for(int i = 0; i < 4; ++i){
+				if(!p.second->vector_endings[i].visited){
+					temp_i++;
+				}
+			}
+			if(temp_i == 4){
+				search_circuid(p.first);
+			}
 		}
 	}
 	for(auto p : element_map) {
-		p.second->visited = false;
+		for(int i = 0; i  < p.second->vector_endings.size(); ++i){
+			p.second->vector_endings[i].visited = false;
+		}
 	}
 }
 
@@ -501,6 +515,11 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos){
 				element_map[element_id_ref]->option_window->SetPosition(sf::Vector2f(element_map[element_id_ref]->x + 30, element_map[element_id_ref]->y + 30));
 
 		});
+	
+	temp->image->GetSignal(sfg::Image::OnMouseLeftPress).Connect([&, element_id_ref = element_id]{
+			std::cout<< " move_id\n";
+			moving = element_id_ref;
+		});
 
 //	desktop.Add(temp->option_window);
 //	desktop.BringToFront(temp->option_window);
@@ -755,27 +774,145 @@ int Hotwire::wire_delete(int id){
 	bufferSecondElement = -1;
 }
 
-int Hotwire::search_circuid(int id){	
-	if(element_map[id]->vector_endings[0].other_element_id != -1){
-		std::cout<<" dfs( "<< element_map[id]->vector_endings[0].other_element_id << ", " << id << ", "<< "0" << "); \n\n"; 
-		dfs(element_map[id]->vector_endings[0].other_element_id, id, 0);
+int Hotwire::search_circuid(int id){
+	std::cout<< "search_circuid\n\n";
+	std::vector<edge> vector_edge;
+	edge new_edge;
+	std::vector<edge> temp_edge;
+	float temp_res = 0;
+	float temp_vol = 0;
+	int temp_i = 0;
+	for(int i = 0; i < element_map[id]->vector_endings.size(); ++i){
+		if(element_map[id]->vector_endings[i].other_element_id != -1){
+			temp_i++;
+		}
 	}
-	
-}
-
-
-int Hotwire::dfs(int id, int before_id, int before_ending_id){
-	if(!element_map[id]->visited){
-		element_map[id]->visited = true;
-		for(int i = 0; i < element_map[id]->vector_endings.size(); ++i){
-			if(element_map[id]->vector_endings[i].other_element_id != -1){
-				if(element_map[id]->vector_endings[i].other_element_id != before_id ){
-					std::cout<<" dfs( "<< element_map[id]->vector_endings[i].other_element_id << ", " << id << ", "<< i << "); \n\n"; 
-					dfs(element_map[id]->vector_endings[i].other_element_id, id, i);
-				}
+	if(temp_i > 0){
+		temp_edge = dfs(id, 0, 0);
+		for(int i = 0; i < temp_edge.size(); ++i){
+			if(element_map[ temp_edge[i].end_id ]->getType() == "knot"){
+					temp_edge[i].begin_id = id;
+					temp_res += temp_edge[i].resistance;
+					temp_vol += temp_edge[i].voltage;
+					
+					new_edge.begin_id = id;
+					new_edge.end_id = temp_edge[i].end_id;
+					new_edge.resistance = temp_res;
+					new_edge.voltage = temp_vol;
+					
+					std::cout<<"begin_id: "<< new_edge.begin_id << "\n";
+					std::cout<<"end_id: "<< new_edge.end_id << "\n";
+					std::cout<<"resistance: "<< new_edge.resistance << "\n";
+					std::cout<<"voltage: "<< new_edge.voltage << "\n\n";
+					vector_edge.push_back(new_edge);
 			}
 		}
 	}
 }
 
+
+std::vector< Hotwire::edge> Hotwire::dfs(int id, int before_id, int before_ending_id){
+	edge temp_edge;
+	std::vector<edge> vector_edge;
+	for(int i = 0; i < element_map[id]->vector_endings.size(); ++i){
+		if(!element_map[id]->vector_endings[i].visited){
+			if(element_map[id]->vector_endings[i].other_element_id != -1){
+				if(!element_map[ element_map[id]->vector_endings[i].other_element_id ]->vector_endings[  element_map[id]->vector_endings[i].other_element_ending_id   ].visited){
+					temp_edge = deadly_dfs(element_map[id]->vector_endings[i].other_element_id, id, i);
+					std::cout<<temp_edge.end_id<<"\n";
+					element_map[id]->vector_endings[i].visited = true;
+					vector_edge.push_back(temp_edge);
+				}
+			}
+		}
+	}
+	return vector_edge;
+}
+
+
+Hotwire::edge Hotwire::deadly_dfs(int id, int before_id, int before_ending_id){
+	edge new_edge;
+	edge temp_edge;
+
+	for(int i = 0; i < element_map[id]->vector_endings.size(); ++i){
+		if(!element_map[id]->vector_endings[i].visited){
+			if(element_map[id]->vector_endings[i].other_element_id != -1){
+				if(!element_map[ element_map[id]->vector_endings[i].other_element_id ]->vector_endings[  element_map[id]->vector_endings[i].other_element_ending_id   ].visited){
+						element_map[id]->vector_endings[i].visited = true;
+						if(element_map[ id ]->getType() == "knot"){
+							new_edge.resistance += element_map[id]->resistance;
+							new_edge.voltage += element_map[id]->voltage;
+							new_edge.end_id = id;
+							element_map[new_edge.end_id]->vector_endings[i].visited = true;
+							return new_edge;
+						}else{
+							temp_edge = deadly_dfs(element_map[id]->vector_endings[i].other_element_id, id, i);
+							element_map[temp_edge.end_id]->vector_endings[i].visited = true;
+							new_edge.resistance += temp_edge.resistance;
+							new_edge.voltage += temp_edge.voltage;
+
+							new_edge.end_id = temp_edge.end_id;
+						}
+				}else{	
+					new_edge.resistance += element_map[id]->resistance;
+					new_edge.voltage += element_map[id]->voltage;
+					new_edge.end_id = id;
+					element_map[id]->vector_endings[i].visited = true;
+
+				}
+			}else{
+
+				new_edge.resistance += element_map[id]->resistance;
+				new_edge.voltage += element_map[id]->voltage;
+				new_edge.end_id = id;
+				element_map[id]->vector_endings[i].visited = true;
+
+			}
+		}else{
+			new_edge.resistance += element_map[id]->resistance;
+			new_edge.voltage += element_map[id]->voltage;
+			new_edge.end_id = id;
+			element_map[id]->vector_endings[i].visited = true;
+		}
+	}
+	return new_edge;
+}
+
+int Hotwire::move(int id){
+	if(elements_position_set.count( std::make_pair( ((mouse.getPosition().x/60))*60, ((mouse.getPosition().y/60))*60 )) > 0){
+			return 0;
+	}
+	int b1 = 0;
+	int b2 = 0;
+	int I_F = 0;
+	int I_S = 0;	
+	elements_position_set.erase(std::make_pair(element_map[id]->x, element_map[id]->y));
+	for(int i = 0; i < element_map[id]->vector_endings.size(); ++i){
+		fixed->Remove(element_map[id]->vector_endings[i].ending_button);
+		element_map[id]->x = ((mouse.getPosition().x/60))*60;
+		element_map[id]->y = ((mouse.getPosition().y/60))*60;
+		if(element_map[id]->vector_endings[i].lay == "left")
+			fixed->Put( element_map[id]->vector_endings[i].ending_button, sf::Vector2f(element_map[id]->x - 3 - 5, element_map[id]->y + 30 - 3 - 5));
+		if(element_map[id]->vector_endings[i].lay == "right")
+			fixed->Put( element_map[id]->vector_endings[i].ending_button, sf::Vector2f(element_map[id]->x + 60 - 3 - 5, element_map[id]->y + 30 - 3 - 5));
+		if(element_map[id]->vector_endings[i].lay == "down")
+			fixed->Put( element_map[id]->vector_endings[i].ending_button, sf::Vector2f(element_map[id]->x + 30 - 3 - 5, element_map[id]->y + 60 - 3 - 5));
+		if(element_map[id]->vector_endings[i].lay == "up")
+			fixed->Put( element_map[id]->vector_endings[i].ending_button, sf::Vector2f(element_map[id]->x + 30 - 3 - 5, element_map[id]->y  - 3 - 5));
+		if(element_map[id]->vector_endings[i].wire_id != -1){
+			b1 = wires_map[ element_map[id]->vector_endings[i].wire_id ]->first_other_id;	
+			b2 = wires_map[ element_map[id]->vector_endings[i].wire_id ]->second_other_id;
+
+			I_F = wires_map[ element_map[id]->vector_endings[i].wire_id ]->first_other_ending_id;
+			I_S = wires_map[ element_map[id]->vector_endings[i].wire_id ]->second_other_ending_id;
+
+			wire_delete(element_map[id]->vector_endings[i].wire_id);
+			wire_making(b1, b2, I_F, I_S);
+		}
+	}
+
+	fixed->Remove(element_map[id]->image);
+	fixed->Put(element_map[id]->image, sf::Vector2f(element_map[id]->x, element_map[id]->y));
+	elements_position_set.insert(std::make_pair( ((element_map[id]->x/60))*60, ((element_map[id]->y/60))*60 ));
+}
 

@@ -33,14 +33,24 @@ class Hotwire{
 		sfg::Box::Ptr box = sfg::Box::Create();	
 
 		sfg::Window::Ptr sfgui_window = sfg::Window::Create();
+		sfg::Window::Ptr sfgui_window_bar = sfg::Window::Create(sfg::Window::Style::TITLEBAR | sfg::Window::Style::BACKGROUND);
+
 		sfg::Window::Ptr sfgui_window_menu = sfg::Window::Create();
 		sfg::Window::Ptr sfgui_window_pause = sfg::Window::Create();
-		sfg::Window::Ptr sfgui_window_bar = sfg::Window::Create(sfg::Window::Style::TITLEBAR | sfg::Window::Style::BACKGROUND);
+		sfg::Window::Ptr sfgui_window_about= sfg::Window::Create();
+
 
 		sfg::Button::Ptr clear_button = sfg::Button::Create();
 
 		sf::Vector2f pos_bar;
-	
+
+
+		struct edge{
+			int begin_id;
+			int end_id;
+			float resistance = 0;
+			float voltage = 0;
+		};
 
 		std::map<std::string, sfg::Image::Ptr> image_map;
 
@@ -78,15 +88,20 @@ class Hotwire{
 		int wire_id = 0;
 		int element_id = 0;
 
+		int  moving = 0;
+
 
 		int element_delete(int id);
 		int wire_delete(int id);
 
 		int search_circuid(int id);
-		int dfs(int id, int before_id, int before_ending_id);
+		std::vector<edge> dfs(int id, int before_id, int before_ending_id);
+		edge deadly_dfs( int id, int before_id, int before_ending_id);
 
 		int element_making(std::string name, sf::Vector2i pos);
 		int wire_making(int b1, int b2, int I_F_E_B, int I_S_E_B);
+		
+		int move(int id);
 
 		std::string regex_string(std::string string);
 
