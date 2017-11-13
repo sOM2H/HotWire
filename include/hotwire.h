@@ -36,6 +36,8 @@ class Hotwire{
 		sfg::Window::Ptr sfgui_window_bar = sfg::Window::Create(sfg::Window::Style::TITLEBAR | sfg::Window::Style::BACKGROUND);
 ///
 		sfg::Window::Ptr sfgui_window_menu = sfg::Window::Create();
+	
+		sfg::Image::Ptr About_image = sfg::Image::Create();
 
 		sfg::Button::Ptr Start = sfg::Button::Create();
 		sfg::Button::Ptr About = sfg::Button::Create();
@@ -45,6 +47,8 @@ class Hotwire{
 		sfg::Button::Ptr test1 = sfg::Button::Create();
 		sfg::Button::Ptr test2 = sfg::Button::Create();
 		sfg::Button::Ptr test3 = sfg::Button::Create();
+
+		sfg::Button::Ptr backToMenu = sfg::Button::Create();
 
 		sfg::Fixed::Ptr fixed_menu = sfg::Fixed::Create();
 		sfg::Fixed::Ptr fixed_tests = sfg::Fixed::Create();

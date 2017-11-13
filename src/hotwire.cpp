@@ -1,10 +1,9 @@
-#include "hotwire.h"
-#include <SFGUI/SFGUI.hpp>
 #include <SFGUI/Widgets.hpp>
 #include <SFGUI/FileResourceLoader.hpp>
 #include <iostream>
 #include <algorithm>
 #include <stdlib.h>
+#include <hotwire.h>
 
 Hotwire::Hotwire()
 	/*: render_window(sf::VideoMode(800, 600), "HotWire", 5)*/
@@ -20,16 +19,35 @@ void Hotwire::init(){
 ///////
 
 	std::string images[] = {
-	"lamp", "battery", "resistor", "ampermeter", "voltmeter", "bell", "coil", "transistor", "switch", "loles", "reostat", "dot", "start", "exit", "tests"
+	"lamp", "battery", "resistor",
+   	"ampermeter", "voltmeter", "bell",
+   	"coil", "transistor", "switch",
+   	"loles", "reostat", "dot",
+   	"start", "exit", "tests",
+   	"easy", "medium", "hard",
+	"about"	
     };
 
     for (const std::string & name : images) {
 		init_image(name);
     }
+	
+	backToMenu->SetImage(image_map["exit"]);
+	backToMenu->SetRequisition(sf::Vector2f());
+	fixed->Put(backToMenu, sf::Vector2f(SFGUI_WS_W - backToMenu->GetAllocation().width, SFGUI_WS_H - backToMenu->GetAllocation().height));
+
+	backToMenu->GetSignal(sfg::Widget::OnLeftClick ).Connect([&]{
+			desktop.BringToFront(sfgui_window_menu);	
+			state = "menu";
+	});
 
 
     sfgui_window_menu->SetStyle(sfg::Window::Style::BACKGROUND);
 	sfgui_window_tests->SetStyle(sfg::Window::Style::BACKGROUND);
+	sfgui_window_about->SetStyle(sfg::Window::Style::BACKGROUND);
+
+	sfgui_window_about->SetRequisition(sf::Vector2f(SFGUI_WS_W + 22, SFGUI_WS_H + 22));
+	sfgui_window_about->SetPosition(sf::Vector2f(-11, -11));
 
 	sfgui_window_menu->SetRequisition(sf::Vector2f(SFGUI_WS_W + 22, SFGUI_WS_H + 22));
 	sfgui_window_menu->SetPosition(sf::Vector2f(-11, -11));
@@ -37,7 +55,16 @@ void Hotwire::init(){
 	sfgui_window_tests->SetRequisition(sf::Vector2f(SFGUI_WS_W + 22, SFGUI_WS_H + 22));
 	sfgui_window_tests->SetPosition(sf::Vector2f(-11, -11));
 
-	test3->SetLabel("test 3");
+
+	sf::Image image;
+	image.loadFromFile("src/textures/about_image.jpg");
+	About_image->SetImage(image);
+
+	About_image->SetPosition(sf::Vector2f());
+	
+
+
+	test3->SetImage(image_map["hard"]);
 	test3->SetRequisition(sf::Vector2f());
 	fixed_tests->Put(test3, sf::Vector2f(100, 100));
 
@@ -50,10 +77,12 @@ void Hotwire::init(){
 		#endif
 	});
 
+	
 
-	test2->SetLabel("test 2");
+	test2->SetImage(image_map["medium"]);
 	test2->SetRequisition(sf::Vector2f());
 	fixed_tests->Put(test2, sf::Vector2f(100, 200));
+
 
 	test2->GetSignal(sfg::Widget::OnLeftClick ).Connect([&]{
 			
@@ -65,23 +94,22 @@ void Hotwire::init(){
 		#endif
 	});
 
-	test1->SetLabel("test 1");
+	test1->SetImage(image_map["easy"]);	
 	test1->SetRequisition(sf::Vector2f());
 	fixed_tests->Put(test1, sf::Vector2f(100, 300));
 
 	test1->GetSignal(sfg::Widget::OnLeftClick ).Connect([&]{
 			
-		#ifdef __windows
+		#if defined(__windows)
 		system("start https://docs.google.com/forms/d/1VO2b0hD3EgKVc0vJ7L0sn9SWkGqAGFIBHREkaVivhiY/edit?fbzx=-1838048315125321500");
-		#endif
-		#ifdef __linux
+		#elif defined(__linux)
 		system("xdg-open https://docs.google.com/forms/d/1VO2b0hD3EgKVc0vJ7L0sn9SWkGqAGFIBHREkaVivhiY/edit?fbzx=-1838048315125321500");
 		#endif
 	});
 
 	Start->SetImage(image_map["start"]);
 	Start->SetRequisition(sf::Vector2f());
-	fixed_menu->Put(Start, sf::Vector2f(100, 100));
+	fixed_menu->Put(Start, sf::Vector2f(SFGUI_WS_W/2 - 75, SFGUI_WS_H/5 - 25));
 
 	Start->GetSignal(sfg::Widget::OnLeftClick ).Connect([&]{
 			desktop.BringToFront(sfgui_window);	
@@ -91,17 +119,25 @@ void Hotwire::init(){
 
 	Tests->SetImage(image_map["tests"]);
 	Tests->SetRequisition(sf::Vector2f());
-	fixed_menu->Put(Tests, sf::Vector2f(100, 400));
-
+	fixed_menu->Put(Tests, sf::Vector2f(SFGUI_WS_W/2 - 75, SFGUI_WS_H/5 - 25 + SFGUI_WS_H/5));
 
 	Tests->GetSignal(sfg::Widget::OnLeftClick ).Connect([&]{
 			desktop.BringToFront(sfgui_window_tests);
 			state = "tests";
 			});
 
+	About->SetImage(image_map["about"]);
+	About->SetRequisition(sf::Vector2f());
+	fixed_menu->Put(About, sf::Vector2f(SFGUI_WS_W/2 - 75, SFGUI_WS_H/5 - 25 + SFGUI_WS_H/5*2));
+
+	About->GetSignal(sfg::Widget::OnLeftClick ).Connect([&]{
+			desktop.BringToFront(sfgui_window_about);
+			state = "about";
+	});
+
 	Exit->SetImage(image_map["exit"]);
 	Exit->SetRequisition(sf::Vector2f());
-	fixed_menu->Put(Exit, sf::Vector2f(100, 700));
+	fixed_menu->Put(Exit, sf::Vector2f(SFGUI_WS_W/2 - 75, SFGUI_WS_H/5 - 25 + SFGUI_WS_H/5*3));
 
 	Exit->GetSignal(sfg::Widget::OnLeftClick ).Connect([&]{
 			running = false;
@@ -109,7 +145,9 @@ void Hotwire::init(){
 
 
 	sfgui_window_tests->Add(fixed_tests);
+	sfgui_window_about->Add(About_image);
 	sfgui_window_menu->Add(fixed_menu);
+	desktop.Add(sfgui_window_about);
 	desktop.Add(sfgui_window_tests);
 	desktop.Add(sfgui_window_menu);
 
@@ -239,6 +277,9 @@ void Hotwire::handle_events(){
 				desktop.BringToFront(sfgui_window_menu);
 				state = "menu";
 			}else if(state == "programm"){	
+				desktop.BringToFront(sfgui_window_menu);
+				state = "menu";
+			}else if(state == "about"){
 				desktop.BringToFront(sfgui_window_menu);
 				state = "menu";
 			}
@@ -484,7 +525,6 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos){
 				desktop.BringToFront(sfgui_window_bar);
 				});
 
-		temp->option_window_box->SetSpacing(5.f);
 
 		temp->option_window_ok_box->Pack(temp->option_window_ok);
 		temp->option_window_box->Pack(temp->option_window_ok_box, false, false);
@@ -598,6 +638,8 @@ int Hotwire::element_making(std::string name, sf::Vector2i pos){
 
     temp->x = ((pos.x/60))*60;
     temp->y = ((pos.y/60))*60;
+
+	temp->option_window_box->SetSpacing(5.f);
 
 	elements_position_set.insert(std::make_pair( ((pos.x/60))*60, ((pos.y/60))*60 ));
 
@@ -886,7 +928,7 @@ int Hotwire::wire_delete(int id){
 }
 
 int Hotwire::search_circuid(int id){
-	std::cout<< "search_circuid\n\n";
+	std::cout<< "search_circuit\n\n";
 	std::vector<edge> vector_edge;
 	edge new_edge;
 	std::vector<edge> temp_edge;
@@ -949,20 +991,30 @@ Hotwire::edge Hotwire::deadly_dfs(int id, int before_id, int before_ending_id){
 		if(!element_map[id]->vector_endings[i].visited){
 			if(element_map[id]->vector_endings[i].other_element_id != -1){
 				if(!element_map[ element_map[id]->vector_endings[i].other_element_id ]->vector_endings[  element_map[id]->vector_endings[i].other_element_ending_id   ].visited){
-						element_map[id]->vector_endings[i].visited = true;
-						if(element_map[ id ]->getType() == "knot"){
-							new_edge.resistance += element_map[id]->resistance;
-							new_edge.voltage += element_map[id]->voltage;
-							new_edge.end_id = id;
-							element_map[new_edge.end_id]->vector_endings[i].visited = true;
-							return new_edge;
-						}else{
+						if(element_map[id]->getType() != "knot"){
+
 							temp_edge = deadly_dfs(element_map[id]->vector_endings[i].other_element_id, id, i);
 							element_map[temp_edge.end_id]->vector_endings[i].visited = true;
 							new_edge.resistance += temp_edge.resistance;
 							new_edge.voltage += temp_edge.voltage;
-
 							new_edge.end_id = temp_edge.end_id;
+
+							element_map[id]->vector_endings[i].visited = true;
+							new_edge.resistance += element_map[id]->resistance;
+							new_edge.voltage += element_map[id]->voltage;
+							new_edge.end_id = id;
+							element_map[new_edge.end_id]->vector_endings[i].visited = true;
+
+							return new_edge;
+						}else{
+
+							element_map[id]->vector_endings[i].visited = true;
+							new_edge.resistance += element_map[id]->resistance;
+							new_edge.voltage += element_map[id]->voltage;
+							new_edge.end_id = id;
+							element_map[new_edge.end_id]->vector_endings[i].visited = true;
+
+							return new_edge;
 						}
 				}else{	
 					new_edge.resistance += element_map[id]->resistance;
