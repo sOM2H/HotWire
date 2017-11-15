@@ -25,6 +25,7 @@ class Hotwire{
 
 		sfg::Canvas::Ptr canvas = sfg::Canvas::Create();
 		sfg::Canvas::Ptr canvas_background = sfg::Canvas::Create();
+		sfg::Canvas::Ptr canvas_background_start = sfg::Canvas::Create();
 
 		sfg::Desktop desktop;
 
@@ -39,14 +40,17 @@ class Hotwire{
 		sfg::Window::Ptr sfgui_window_bar = sfg::Window::Create(sfg::Window::Style::TITLEBAR | sfg::Window::Style::BACKGROUND);
 ///
 		sfg::Window::Ptr sfgui_window_menu = sfg::Window::Create();
+		sfg::Window::Ptr sfgui_window_start = sfg::Window::Create();
 	
 		sfg::Image::Ptr About_image = sfg::Image::Create();
 		sfg::Image::Ptr background = sfg::Image::Create();
+		sfg::Image::Ptr background_start = sfg::Image::Create();
 
 		sfg::Button::Ptr Start = sfg::Button::Create();
 		sfg::Button::Ptr About = sfg::Button::Create();
 		sfg::Button::Ptr Tests = sfg::Button::Create();
 		sfg::Button::Ptr Exit = sfg::Button::Create();
+		sfg::Image::Ptr hotwire_start = sfg::Image::Create();
 
 		sfg::Button::Ptr test1 = sfg::Button::Create();
 		sfg::Button::Ptr test2 = sfg::Button::Create();
@@ -56,6 +60,7 @@ class Hotwire{
 
 		sfg::Fixed::Ptr fixed_menu = sfg::Fixed::Create();
 		sfg::Fixed::Ptr fixed_tests = sfg::Fixed::Create();
+		sfg::Fixed::Ptr fixed_start = sfg::Fixed::Create();
 ///
 		sfg::Window::Ptr sfgui_window_tests = sfg::Window::Create();
 

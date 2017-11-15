@@ -16,7 +16,7 @@ Hotwire::Hotwire()
 void Hotwire::init(){
 
     render_window.resetGLStates();
-    state = "menu";
+    state = "start";
 ///////
 
 	std::string images[] = {
@@ -26,7 +26,7 @@ void Hotwire::init(){
    	"loles", "reostat", "dot",
    	"start", "exit", "tests",
    	"easy", "medium", "hard",
-	"about"	
+	"about", "hotwire"
     };
 
     for (const std::string & name : images) {
@@ -34,8 +34,9 @@ void Hotwire::init(){
     }
 	
 	backToMenu->SetImage(image_map["exit"]);
-	backToMenu->SetRequisition(sf::Vector2f());
+	backToMenu->SetRequisition();
 	fixed->Put(backToMenu, sf::Vector2f(SFGUI_WS_W - backToMenu->GetAllocation().width, SFGUI_WS_H - backToMenu->GetAllocation().height));
+	std::cout<<SFGUI_WS_W - backToMenu->GetAllocation().width << " " << SFGUI_WS_H - backToMenu->GetAllocation().height << "\n";
 
 	backToMenu->GetSignal(sfg::Widget::OnLeftClick ).Connect([&]{
 			desktop.BringToFront(sfgui_window_menu);	
@@ -46,6 +47,7 @@ void Hotwire::init(){
     sfgui_window_menu->SetStyle(sfg::Window::Style::BACKGROUND);
 	sfgui_window_tests->SetStyle(sfg::Window::Style::BACKGROUND);
 	sfgui_window_about->SetStyle(sfg::Window::Style::BACKGROUND);
+	sfgui_window_start->SetStyle(sfg::Window::Style::BACKGROUND);
 
 	sfgui_window_about->SetRequisition(sf::Vector2f(SFGUI_WS_W + 22, SFGUI_WS_H + 22));
 	sfgui_window_about->SetPosition(sf::Vector2f(-11, -11));
@@ -56,15 +58,44 @@ void Hotwire::init(){
 	sfgui_window_tests->SetRequisition(sf::Vector2f(SFGUI_WS_W + 22, SFGUI_WS_H + 22));
 	sfgui_window_tests->SetPosition(sf::Vector2f(-11, -11));
 
+	sfgui_window_start->SetRequisition(sf::Vector2f(SFGUI_WS_W + 22, SFGUI_WS_H + 22));
+	sfgui_window_start->SetPosition(sf::Vector2f(-11, -11));
 
 	sf::Image image;
 	image.loadFromFile("src/textures/about_image.jpg");
 	About_image->SetImage(image);
 
 	About_image->SetPosition(sf::Vector2f());
+
+
+	sf::Texture texture_back1;
+	texture_back1.loadFromFile("src/textures/start_back.png");
+	sf::RectangleShape rect_text1;
+	rect_text1.setSize(sf::Vector2f(SFGUI_WS_W, SFGUI_WS_H) );
+	rect_text1.setTexture(&texture_back1, true);
+
+	sf::Image mg;
+	mg.loadFromFile("src/textures/hotwire.png");
+	hotwire_start->SetImage(mg);
+
+	hotwire_start->GetSignal(sfg::Image::OnMouseLeftPress).Connect([&]{
+			state = "menu";
+			desktop.BringToFront(sfgui_window_menu);
+	});
+
+	sfgui_window_start->Add(fixed_start);
+                                                                                                                               	
+
+
+	canvas_background_start->SetRequisition(sf::Vector2f(SFGUI_WS_W, SFGUI_WS_H));
+	canvas_background_start->Bind();
+	canvas_background_start->Clear();
+	canvas_background_start->Draw(rect_text1);
+	canvas_background_start->Unbind();
+
+	fixed_start->Put(canvas_background_start, sf::Vector2f());	
+	fixed_start->Put(hotwire_start, sf::Vector2f(SFGUI_WS_W/2 - hotwire_start->GetAllocation().width/2 + 30, SFGUI_WS_H/2 - hotwire_start->GetAllocation().height/2 + 30));	
 	
-
-
 	sf::Texture texture_back;
 	texture_back.loadFromFile("src/textures/background.png");
 	sf::RectangleShape rect_text;
@@ -78,6 +109,7 @@ void Hotwire::init(){
 	hot_text.setSize(sf::Vector2f(400, 100) );
 	hot_text.setTexture(&hotwire_back, true);
 	hot_text.setPosition(sf::Vector2f(SFGUI_WS_W/6, SFGUI_WS_H/5));
+
 
 	canvas_background->SetRequisition(sf::Vector2f(SFGUI_WS_W, SFGUI_WS_H));
 	canvas_background->Bind();
@@ -133,7 +165,7 @@ void Hotwire::init(){
 
 	Start->SetImage(image_map["start"]);
 	Start->SetRequisition(sf::Vector2f());
-	fixed_menu->Put(Start, sf::Vector2f(SFGUI_WS_W/2 - 75, SFGUI_WS_H/5 - 25));
+	fixed_menu->Put(Start, sf::Vector2f(SFGUI_WS_W/2 - 75 + SFGUI_WS_W/6, SFGUI_WS_H/6 - 25));
 
 	Start->GetSignal(sfg::Widget::OnLeftClick ).Connect([&]{
 			desktop.BringToFront(sfgui_window);	
@@ -143,7 +175,7 @@ void Hotwire::init(){
 
 	Tests->SetImage(image_map["tests"]);
 	Tests->SetRequisition(sf::Vector2f());
-	fixed_menu->Put(Tests, sf::Vector2f(SFGUI_WS_W/2 - 75, SFGUI_WS_H/5 - 25 + SFGUI_WS_H/5));
+	fixed_menu->Put(Tests, sf::Vector2f(SFGUI_WS_W/2 - 75 + SFGUI_WS_W/6, SFGUI_WS_H/6 - 25 + SFGUI_WS_H/6));
 
 	Tests->GetSignal(sfg::Widget::OnLeftClick ).Connect([&]{
 			desktop.BringToFront(sfgui_window_tests);
@@ -152,7 +184,7 @@ void Hotwire::init(){
 
 	About->SetImage(image_map["about"]);
 	About->SetRequisition(sf::Vector2f());
-	fixed_menu->Put(About, sf::Vector2f(SFGUI_WS_W/2 - 75, SFGUI_WS_H/5 - 25 + SFGUI_WS_H/5*2));
+	fixed_menu->Put(About, sf::Vector2f(SFGUI_WS_W/2 - 75 + SFGUI_WS_W/6, SFGUI_WS_H/6 - 25 + SFGUI_WS_H/6*2));
 
 	About->GetSignal(sfg::Widget::OnLeftClick ).Connect([&]{
 			desktop.BringToFront(sfgui_window_about);
@@ -161,7 +193,7 @@ void Hotwire::init(){
 
 	Exit->SetImage(image_map["exit"]);
 	Exit->SetRequisition(sf::Vector2f());
-	fixed_menu->Put(Exit, sf::Vector2f(SFGUI_WS_W/2 - 75, SFGUI_WS_H/5 - 25 + SFGUI_WS_H/5*3));
+	fixed_menu->Put(Exit, sf::Vector2f(SFGUI_WS_W/2 - 75 + SFGUI_WS_W/6, SFGUI_WS_H/6 - 25 + SFGUI_WS_H/6*3));
 
 	Exit->GetSignal(sfg::Widget::OnLeftClick ).Connect([&]{
 			running = false;
@@ -171,6 +203,7 @@ void Hotwire::init(){
 	sfgui_window_tests->Add(fixed_tests);
 	sfgui_window_about->Add(About_image);
 	sfgui_window_menu->Add(fixed_menu);
+	desktop.Add(sfgui_window_start);
 	desktop.Add(sfgui_window_about);
 	desktop.Add(sfgui_window_tests);
 	desktop.Add(sfgui_window_menu);
@@ -193,9 +226,10 @@ void Hotwire::init(){
 	clear_button->GetSignal(sfg::Widget::OnLeftClick ).Connect([&]{
 		for (auto & p : element_map) {
 			element_delete(p.first);
-			desktop.BringToFront(sfgui_window);	
-			desktop.BringToFront(sfgui_window_bar);
-		}
+		}	
+
+		desktop.BringToFront(sfgui_window);	
+		desktop.BringToFront(sfgui_window_bar);
 		element_id = 0;
 	});
 
@@ -265,7 +299,7 @@ void Hotwire::init(){
 
 	desktop.BringToFront( sfgui_window);
 	desktop.BringToFront(sfgui_window_bar);
-	desktop.BringToFront( sfgui_window_menu);
+	desktop.BringToFront( sfgui_window_start);
 
     running = true;
 	
@@ -295,8 +329,11 @@ void Hotwire::handle_events(){
     sf::Event event;
     while (render_window.pollEvent(event)){
         if(event.type == sf::Event::Closed || event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Escape){
-			if(state == "menu"){
-            	running = false;
+			if(state == "start"){
+				running = false;
+			}else if(state == "menu"){
+				desktop.BringToFront(sfgui_window_start);
+            	state = "start";
 			}else if(state == "tests"){
 				desktop.BringToFront(sfgui_window_menu);
 				state = "menu";
@@ -375,6 +412,7 @@ void Hotwire::update(){
 			p.second->vector_endings[i].visited = false;
 		}
 	}
+	search_contour();
 	vector_edge.clear();
 	edge_id = 0;
 }
@@ -1022,13 +1060,9 @@ Hotwire::edge Hotwire::deadly_dfs(int id, int ending_id, int before_id, int befo
 	
 	std::cout<<"point 2\n";
 	for(int i = 0; i < element_map[id]->vector_endings.size(); ++i){
-		std::cout<<"point 3\n";
 		if(!element_map[id]->vector_endings[i].visited){
-			std::cout<<"point 4\n";
 			element_map[id]->vector_endings[i].visited = true;
 			if(element_map[id]->vector_endings[i].other_element_id != -1){
-				std::cout<<"point 6\n";
-
 
 				temp_edge = deadly_dfs(element_map[id]->vector_endings[i].other_element_id, element_map[id]->vector_endings[i].other_element_ending_id, id, i);
 
@@ -1094,13 +1128,10 @@ int Hotwire::move(int id){
 #include <utility>
 int Hotwire::search_contour(){
 	std::vector<std::pair<int, int> > list[100];
-	for (int i = 1; i <= vector_edge.size(); i++)
+	for (int i = 1; i < vector_edge.size(); i++)
 	{
-		if (!edge_set.count(i))
-		{
-			list[vector_edge[i].begin_id].push_back(std::make_pair(vector_edge[i].end_id, vector_edge[i].id));
-			list[vector_edge[i].end_id].push_back(std::make_pair(vector_edge[i].begin_id, vector_edge[i].id));
-		}
+		list[vector_edge[i].begin_id].push_back(std::make_pair(vector_edge[i].end_id, vector_edge[i].id));
+		list[vector_edge[i].end_id].push_back(std::make_pair(vector_edge[i].begin_id, vector_edge[i].id));
 	}
 	std::queue<int> q;
 	int f, s, way[vertex_amount], rebr[vertex_amount];
@@ -1109,39 +1140,44 @@ int Hotwire::search_contour(){
 	}
 	for (size_t i = 1; i <= vector_edge.size(); i++)
 	{
+		int just_another_variable;
 		if (!edge_set.count(i))
 		{
-			edge_set.insert(i);
+			just_another_variable = i;
 			q.push(vector_edge[i].begin_id);
 			f = vector_edge[i].end_id;
 			s = vector_edge[i].begin_id;
-			break;
 		}
-	}
-	bool used[vertex_amount] = {false};      /////////////////////////////////////////////////////////////////////////////////
-	while(!q.empty()){
-		int v = q.front();
-		if (v == f)
-			break;
-		q.pop();
-		for (size_t i = 0; i < list[v].size(); i++)
+		else
 		{
-			int to = list[v][i].first;
-			if (used[to] == false)
+			continue;
+		}
+		bool used[vertex_amount] = {false};      /////////////////////////////////////////////////////////////////////////////////
+		while(!q.empty()){
+			int v = q.front();
+			if (v == f)
+				break;
+			q.pop();
+			for (size_t i = 0; i < list[v].size(); i++)
 			{
-				q.push(to);
-				used[to] = true;
-				way[to] = v;
-				rebr[to] = list[v][i].second;
+				int to = list[v][i].first;
+				if (used[to] == false)
+				{
+					q.push(to);
+					used[to] = true;
+					way[to] = v;
+					rebr[to] = list[v][i].second;
+				}
 			}
 		}
-	}
-	while (1)
-	{
-		edge_set.insert(rebr[f]);
-		f = way[f];
-		if (f == s)
-			break;
+		edge_set.insert(just_another_variable);
+		while (1)
+		{
+			edge_set.insert(rebr[f]);
+			f = way[f];
+			if (f == s)
+				break;
+		}
 	}
 }
 
