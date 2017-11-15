@@ -13,6 +13,7 @@
 #include <SFGUI/Widgets.hpp>
 #include <memory>
 #include <set>
+#include <queue>
 
 class Hotwire{
     public: 
@@ -23,6 +24,8 @@ class Hotwire{
 		sfg::SFGUI sfgui;
 
 		sfg::Canvas::Ptr canvas = sfg::Canvas::Create();
+		sfg::Canvas::Ptr canvas_background = sfg::Canvas::Create();
+
 		sfg::Desktop desktop;
 
 		sf::Mouse mouse;
@@ -38,6 +41,7 @@ class Hotwire{
 		sfg::Window::Ptr sfgui_window_menu = sfg::Window::Create();
 	
 		sfg::Image::Ptr About_image = sfg::Image::Create();
+		sfg::Image::Ptr background = sfg::Image::Create();
 
 		sfg::Button::Ptr Start = sfg::Button::Create();
 		sfg::Button::Ptr About = sfg::Button::Create();
@@ -65,6 +69,7 @@ class Hotwire{
 		std::string state = "none";
 
 		struct edge{
+			int id;
 			int begin_id;
 			int end_id;
 			float resistance = 0;
@@ -79,9 +84,13 @@ class Hotwire{
 		std::map<int, Element* > element_map;
 		std::map<int, Wire* > wires_map;
 
-		std::set<std::pair<int, int> > elements_position_set;	
+		std::set<std::pair<int, int> > elements_position_set;
+
+		std::set<int> edge_set;	
 
 		std::vector<std::pair<int, int> > vector_wires;
+
+		std::vector<std::vector<double>> vector_eq;
 
 		struct wires_struct{
 			sf::VertexArray wires;
@@ -106,6 +115,8 @@ class Hotwire{
 
 		int wire_id = 0;
 		int element_id = 0;
+		int edge_id = 0;
+		int vertex_amount = 0;
 
 		int  moving = 0;
 
@@ -113,9 +124,17 @@ class Hotwire{
 		int element_delete(int id);
 		int wire_delete(int id);
 
-		int search_circuid(int id);
+		int search_circuit(int id);
+		
+		std::vector<edge> vector_edge;
+
 		std::vector<edge> dfs(int id, int before_id, int before_ending_id);
-		edge deadly_dfs( int id, int before_id, int before_ending_id);
+		edge deadly_dfs( int id, int ending_id, int before_id, int before_ending_id);
+
+
+		int gauss (std::vector < std::vector<double> > a, std::vector<double> & ans);
+
+		int search_contour();
 
 		int element_making(std::string name, sf::Vector2i pos);
 		int wire_making(int b1, int b2, int I_F_E_B, int I_S_E_B);

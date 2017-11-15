@@ -3,6 +3,7 @@
 #include <iostream>
 #include <algorithm>
 #include <stdlib.h>
+#include <cmath>
 #include <hotwire.h>
 
 Hotwire::Hotwire()
@@ -63,6 +64,29 @@ void Hotwire::init(){
 	About_image->SetPosition(sf::Vector2f());
 	
 
+
+	sf::Texture texture_back;
+	texture_back.loadFromFile("src/textures/background.png");
+	sf::RectangleShape rect_text;
+	rect_text.setSize(sf::Vector2f(SFGUI_WS_W, SFGUI_WS_H) );
+	rect_text.setTexture(&texture_back, true);
+
+
+	sf::Texture hotwire_back;
+	hotwire_back.loadFromFile("src/textures/hotwire.png");
+	sf::RectangleShape hot_text;
+	hot_text.setSize(sf::Vector2f(400, 100) );
+	hot_text.setTexture(&hotwire_back, true);
+	hot_text.setPosition(sf::Vector2f(SFGUI_WS_W/6, SFGUI_WS_H/5));
+
+	canvas_background->SetRequisition(sf::Vector2f(SFGUI_WS_W, SFGUI_WS_H));
+	canvas_background->Bind();
+	canvas_background->Clear();
+	canvas_background->Draw(rect_text);
+	canvas_background->Draw(hot_text);
+	canvas_background->Unbind();
+	
+	fixed_menu->Put(canvas_background, sf::Vector2f());
 
 	test3->SetImage(image_map["hard"]);
 	test3->SetRequisition(sf::Vector2f());
@@ -153,8 +177,8 @@ void Hotwire::init(){
 
 /////////
     box->Pack(boxIN, false, false);
-	sfgui_window_bar->SetRequisition(sf::Vector2f(0, 270));
-	sfgui_window_bar->SetAllocation(sf::FloatRect(0, 0, 60, 270));
+	sfgui_window_bar->SetRequisition(sf::Vector2f(0, 300));
+	sfgui_window_bar->SetAllocation(sf::FloatRect(0, 0, 60, 300));
 	sfgui_window_bar->SetPosition(sf::Vector2f(0.f, 0.f));
 	sfgui_window_bar->SetTitle("Bar");
  		
@@ -178,7 +202,7 @@ void Hotwire::init(){
 	
 
 	scrolledwindow->SetScrollbarPolicy(sfg::ScrolledWindow::HORIZONTAL_NEVER |  sfg::ScrolledWindow::VERTICAL_AUTOMATIC);
-	scrolledwindow->SetRequisition(sf::Vector2f(60, 270));
+	scrolledwindow->SetRequisition(sf::Vector2f(60, 300));
 
 
 
@@ -320,12 +344,12 @@ void Hotwire::render(){
 	}
 	canvas->Display();
 	canvas->Unbind();
-	canvas->Unbind();
     sfgui.Display( render_window );
     render_window.display();
 }
 
 void Hotwire::update(){
+	vertex_amount = 0;
 	for (auto & p : wires_map) {
 		for(int j = 0; j < 4; ++j){
 					wires_map[ p.first ]->wire[j].color = sf::Color::Yellow;
@@ -335,13 +359,14 @@ void Hotwire::update(){
 		int temp_i  = 0;
 		element_map[p.first]->throughput = false;
 		if(p.second->getType() == "knot"){
+			vertex_amount++;
 			for(int i = 0; i < 4; ++i){
 				if(!p.second->vector_endings[i].visited){
 					temp_i++;
 				}
 			}
-			if(temp_i == 4){
-				search_circuid(p.first);
+			if(temp_i > 0){
+				search_circuit(p.first);
 			}
 		}
 	}
@@ -350,6 +375,8 @@ void Hotwire::update(){
 			p.second->vector_endings[i].visited = false;
 		}
 	}
+	vector_edge.clear();
+	edge_id = 0;
 }
 
 void Hotwire::clear(){
@@ -927,38 +954,38 @@ int Hotwire::wire_delete(int id){
 	bufferSecondElement = -1;
 }
 
-int Hotwire::search_circuid(int id){
-	std::cout<< "search_circuit\n\n";
-	std::vector<edge> vector_edge;
+int Hotwire::search_circuit(int id){
+	std::cout<< "id: "<< id  <<"\n\n";
 	edge new_edge;
 	std::vector<edge> temp_edge;
 	float temp_res = 0;
 	float temp_vol = 0;
 	int temp_i = 0;
-	for(int i = 0; i < element_map[id]->vector_endings.size(); ++i){
-		if(element_map[id]->vector_endings[i].other_element_id != -1){
-			temp_i++;
-		}
-	}
-	if(temp_i > 0){
-		temp_edge = dfs(id, 0, 0);
-		for(int i = 0; i < temp_edge.size(); ++i){
-			if(element_map[ temp_edge[i].end_id ]->getType() == "knot"){
-					temp_edge[i].begin_id = id;
-					temp_res += temp_edge[i].resistance;
-					temp_vol += temp_edge[i].voltage;
-					
-					new_edge.begin_id = id;
-					new_edge.end_id = temp_edge[i].end_id;
-					new_edge.resistance = temp_res;
-					new_edge.voltage = temp_vol;
-					
-					std::cout<<"begin_id: "<< new_edge.begin_id << "\n";
-					std::cout<<"end_id: "<< new_edge.end_id << "\n";
-					std::cout<<"resistance: "<< new_edge.resistance << "\n";
-					std::cout<<"voltage: "<< new_edge.voltage << "\n\n";
-					vector_edge.push_back(new_edge);
-			}
+
+	temp_edge = dfs(id, 0, 0);
+	for(int i = 0; i < temp_edge.size(); ++i){
+		if(element_map[ temp_edge[i].end_id ]->getType() == "knot"){
+				edge_id++;
+				temp_edge[i].id = edge_id;
+				temp_edge[i].begin_id = id;
+				temp_res += temp_edge[i].resistance;
+				temp_vol += temp_edge[i].voltage;
+				
+				new_edge.id = temp_edge[i].id;
+				new_edge.begin_id = id;
+				new_edge.end_id = temp_edge[i].end_id;
+				new_edge.resistance = temp_res;
+				new_edge.voltage = temp_vol;
+
+				std::cout<<"id: "<< new_edge.id << "\n";
+				std::cout<<"begin_id: "<< new_edge.begin_id << "\n";
+				std::cout<<"end_id: "<< new_edge.end_id << "\n";
+				std::cout<<"resistance: "<< new_edge.resistance << "\n";
+				std::cout<<"voltage: "<< new_edge.voltage << "\n\n";
+	
+				vector_edge.push_back(new_edge);
+			temp_res = 0;
+			temp_vol = 0;
 		}
 	}
 }
@@ -969,13 +996,11 @@ std::vector< Hotwire::edge> Hotwire::dfs(int id, int before_id, int before_endin
 	std::vector<edge> vector_edge;
 	for(int i = 0; i < element_map[id]->vector_endings.size(); ++i){
 		if(!element_map[id]->vector_endings[i].visited){
+			element_map[id]->vector_endings[i].visited = true;
 			if(element_map[id]->vector_endings[i].other_element_id != -1){
-				if(!element_map[ element_map[id]->vector_endings[i].other_element_id ]->vector_endings[  element_map[id]->vector_endings[i].other_element_ending_id   ].visited){
-					temp_edge = deadly_dfs(element_map[id]->vector_endings[i].other_element_id, id, i);
-					std::cout<<temp_edge.end_id<<"\n";
-					element_map[id]->vector_endings[i].visited = true;
-					vector_edge.push_back(temp_edge);
-				}
+				temp_edge = deadly_dfs(element_map[id]->vector_endings[i].other_element_id, element_map[id]->vector_endings[i].other_element_ending_id, id, i);
+				temp_edge.begin_id = id;
+				vector_edge.push_back(temp_edge);
 			}
 		}
 	}
@@ -983,61 +1008,47 @@ std::vector< Hotwire::edge> Hotwire::dfs(int id, int before_id, int before_endin
 }
 
 
-Hotwire::edge Hotwire::deadly_dfs(int id, int before_id, int before_ending_id){
+Hotwire::edge Hotwire::deadly_dfs(int id, int ending_id, int before_id, int before_ending_id){
+	std::cout<<"point 1\n";
 	edge new_edge;
 	edge temp_edge;
 
+	element_map[id]->vector_endings[ending_id].visited = true;
+
+	if(element_map[ id ]->getType() == "knot"){
+		new_edge.end_id = id;
+		return new_edge;
+	}
+	
+	std::cout<<"point 2\n";
 	for(int i = 0; i < element_map[id]->vector_endings.size(); ++i){
+		std::cout<<"point 3\n";
 		if(!element_map[id]->vector_endings[i].visited){
+			std::cout<<"point 4\n";
+			element_map[id]->vector_endings[i].visited = true;
 			if(element_map[id]->vector_endings[i].other_element_id != -1){
-				if(!element_map[ element_map[id]->vector_endings[i].other_element_id ]->vector_endings[  element_map[id]->vector_endings[i].other_element_ending_id   ].visited){
-						if(element_map[id]->getType() != "knot"){
+				std::cout<<"point 6\n";
 
-							temp_edge = deadly_dfs(element_map[id]->vector_endings[i].other_element_id, id, i);
-							element_map[temp_edge.end_id]->vector_endings[i].visited = true;
-							new_edge.resistance += temp_edge.resistance;
-							new_edge.voltage += temp_edge.voltage;
-							new_edge.end_id = temp_edge.end_id;
 
-							element_map[id]->vector_endings[i].visited = true;
-							new_edge.resistance += element_map[id]->resistance;
-							new_edge.voltage += element_map[id]->voltage;
-							new_edge.end_id = id;
-							element_map[new_edge.end_id]->vector_endings[i].visited = true;
+				temp_edge = deadly_dfs(element_map[id]->vector_endings[i].other_element_id, element_map[id]->vector_endings[i].other_element_ending_id, id, i);
 
-							return new_edge;
-						}else{
+				new_edge.resistance = element_map[id]->resistance;
+				new_edge.voltage = element_map[id]->voltage;
 
-							element_map[id]->vector_endings[i].visited = true;
-							new_edge.resistance += element_map[id]->resistance;
-							new_edge.voltage += element_map[id]->voltage;
-							new_edge.end_id = id;
-							element_map[new_edge.end_id]->vector_endings[i].visited = true;
+				new_edge.resistance += temp_edge.resistance;
+				new_edge.voltage += temp_edge.voltage;
 
-							return new_edge;
-						}
-				}else{	
-					new_edge.resistance += element_map[id]->resistance;
-					new_edge.voltage += element_map[id]->voltage;
-					new_edge.end_id = id;
-					element_map[id]->vector_endings[i].visited = true;
+				new_edge.end_id = temp_edge.end_id;
 
-				}
+				return new_edge;
 			}else{
-
-				new_edge.resistance += element_map[id]->resistance;
-				new_edge.voltage += element_map[id]->voltage;
 				new_edge.end_id = id;
-				element_map[id]->vector_endings[i].visited = true;
-
 			}
 		}else{
-			new_edge.resistance += element_map[id]->resistance;
-			new_edge.voltage += element_map[id]->voltage;
 			new_edge.end_id = id;
-			element_map[id]->vector_endings[i].visited = true;
 		}
 	}
+
 	return new_edge;
 }
 
@@ -1080,3 +1091,100 @@ int Hotwire::move(int id){
 	moving = 0;
 }
 
+#include <utility>
+int Hotwire::search_contour(){
+	std::vector<std::pair<int, int> > list[100];
+	for (int i = 1; i <= vector_edge.size(); i++)
+	{
+		if (!edge_set.count(i))
+		{
+			list[vector_edge[i].begin_id].push_back(std::make_pair(vector_edge[i].end_id, vector_edge[i].id));
+			list[vector_edge[i].end_id].push_back(std::make_pair(vector_edge[i].begin_id, vector_edge[i].id));
+		}
+	}
+	std::queue<int> q;
+	int f, s, way[vertex_amount], rebr[vertex_amount];
+	if(vector_edge.empty()){
+		return 0;
+	}
+	for (size_t i = 1; i <= vector_edge.size(); i++)
+	{
+		if (!edge_set.count(i))
+		{
+			edge_set.insert(i);
+			q.push(vector_edge[i].begin_id);
+			f = vector_edge[i].end_id;
+			s = vector_edge[i].begin_id;
+			break;
+		}
+	}
+	bool used[vertex_amount] = {false};      /////////////////////////////////////////////////////////////////////////////////
+	while(!q.empty()){
+		int v = q.front();
+		if (v == f)
+			break;
+		q.pop();
+		for (size_t i = 0; i < list[v].size(); i++)
+		{
+			int to = list[v][i].first;
+			if (used[to] == false)
+			{
+				q.push(to);
+				used[to] = true;
+				way[to] = v;
+				rebr[to] = list[v][i].second;
+			}
+		}
+	}
+	while (1)
+	{
+		edge_set.insert(rebr[f]);
+		f = way[f];
+		if (f == s)
+			break;
+	}
+}
+
+int Hotwire::gauss (std::vector < std::vector<double> > a, std::vector<double> & ans) {
+	static const float EPS = 0.0001;
+	int n = (int) a.size();
+	int m = (int) a[0].size() - 1;
+ 
+	std::vector<int> where (m, -1);
+	for (int col=0, row=0; col<m && row<n; ++col) {
+		int sel = row;
+		for (int i=row; i<n; ++i)
+			if (std::abs (a[i][col]) > std::abs (a[sel][col]))
+				sel = i;
+		if (std::abs (a[sel][col]) < EPS)
+			continue;
+		for (int i=col; i<=m; ++i)
+			std::swap (a[sel][i], a[row][i]);
+		where[col] = row;
+ 
+		for (int i=0; i<n; ++i)
+			if (i != row) {
+				double c = a[i][col] / a[row][col];
+				for (int j=col; j<=m; ++j)
+					a[i][j] -= a[row][j] * c;
+			}
+		++row;
+	}
+ 
+	ans.assign (m, 0);
+	for (int i=0; i<m; ++i)
+		if (where[i] != -1)
+			ans[i] = a[where[i]][m] / a[where[i]][i];
+	for (int i=0; i<n; ++i) {
+		double sum = 0;
+		for (int j=0; j<m; ++j)
+			sum += ans[j] * a[i][j];
+		if (std::abs (sum - a[i][m]) > EPS)
+			return 0;
+	}
+ 
+	for (int i=0; i<m; ++i)
+		if (where[i] == -1)
+			//return INF;
+	return 1;
+}
