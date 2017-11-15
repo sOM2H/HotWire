@@ -26,16 +26,17 @@ void Hotwire::init(){
    	"loles", "reostat", "dot",
    	"start", "exit", "tests",
    	"easy", "medium", "hard",
-	"about", "hotwire"
+	"about", "hotwire", "exit1",
+   	"exit2", "final"
     };
 
     for (const std::string & name : images) {
 		init_image(name);
     }
 	
-	backToMenu->SetImage(image_map["exit"]);
+	backToMenu->SetImage(image_map["exit2"]);
 	backToMenu->SetRequisition();
-	fixed->Put(backToMenu, sf::Vector2f(SFGUI_WS_W - backToMenu->GetAllocation().width, SFGUI_WS_H - backToMenu->GetAllocation().height));
+	fixed->Put(backToMenu, sf::Vector2f(SFGUI_WS_W - backToMenu->GetAllocation().width - 10, SFGUI_WS_H - backToMenu->GetAllocation().height - 10));
 	std::cout<<SFGUI_WS_W - backToMenu->GetAllocation().width << " " << SFGUI_WS_H - backToMenu->GetAllocation().height << "\n";
 
 	backToMenu->GetSignal(sfg::Widget::OnLeftClick ).Connect([&]{
@@ -68,6 +69,7 @@ void Hotwire::init(){
 	About_image->SetPosition(sf::Vector2f());
 
 
+
 	sf::Texture texture_back1;
 	texture_back1.loadFromFile("src/textures/start_back.png");
 	sf::RectangleShape rect_text1;
@@ -85,6 +87,17 @@ void Hotwire::init(){
 
 	sfgui_window_start->Add(fixed_start);
                                                                                                                                	
+	sf::Texture texture_back2;
+	texture_back2.loadFromFile("src/textures/background_tests.png");
+	sf::RectangleShape rect_text2;
+	rect_text2.setSize(sf::Vector2f(SFGUI_WS_W, SFGUI_WS_H) );
+	rect_text2.setTexture(&texture_back2, true);
+
+	canvas_background_tests->SetRequisition(sf::Vector2f(SFGUI_WS_W, SFGUI_WS_H));
+	canvas_background_tests->Bind();
+	canvas_background_tests->Clear();
+	canvas_background_tests->Draw(rect_text2);
+	canvas_background_tests->Unbind();
 
 
 	canvas_background_start->SetRequisition(sf::Vector2f(SFGUI_WS_W, SFGUI_WS_H));
@@ -93,7 +106,7 @@ void Hotwire::init(){
 	canvas_background_start->Draw(rect_text1);
 	canvas_background_start->Unbind();
 
-	fixed_start->Put(canvas_background_start, sf::Vector2f());	
+	fixed_start->Put(canvas_background_start, sf::Vector2f());
 	fixed_start->Put(hotwire_start, sf::Vector2f(SFGUI_WS_W/2 - hotwire_start->GetAllocation().width/2 + 30, SFGUI_WS_H/2 - hotwire_start->GetAllocation().height/2 + 30));	
 	
 	sf::Texture texture_back;
@@ -103,42 +116,39 @@ void Hotwire::init(){
 	rect_text.setTexture(&texture_back, true);
 
 
-	sf::Texture hotwire_back;
-	hotwire_back.loadFromFile("src/textures/hotwire.png");
-	sf::RectangleShape hot_text;
-	hot_text.setSize(sf::Vector2f(400, 100) );
-	hot_text.setTexture(&hotwire_back, true);
-	hot_text.setPosition(sf::Vector2f(SFGUI_WS_W/6, SFGUI_WS_H/5));
-
-
 	canvas_background->SetRequisition(sf::Vector2f(SFGUI_WS_W, SFGUI_WS_H));
 	canvas_background->Bind();
 	canvas_background->Clear();
 	canvas_background->Draw(rect_text);
-	canvas_background->Draw(hot_text);
 	canvas_background->Unbind();
 	
 	fixed_menu->Put(canvas_background, sf::Vector2f());
 
-	test3->SetImage(image_map["hard"]);
-	test3->SetRequisition(sf::Vector2f());
-	fixed_tests->Put(test3, sf::Vector2f(100, 100));
-
-	test3->GetSignal(sfg::Widget::OnLeftClick ).Connect([&]{
-		#ifdef __windows
-		system("start https://docs.google.com/forms/d/e/1FAIpQLSdHLbhNACd_BLx5kzW5miylS2i2VIrAbTLFx7IMT2ykSXTPmQ/viewform");
-		#endif
-		#ifdef __linux
-		system("xdg-open https://docs.google.com/forms/d/e/1FAIpQLSdHLbhNACd_BLx5kzW5miylS2i2VIrAbTLFx7IMT2ykSXTPmQ/viewform");
-		#endif
-	});
-
+	test1->SetImage(image_map["easy"]);	
+	test1->SetRequisition(sf::Vector2f());
+	fixed_tests->Put(test1, sf::Vector2f(SFGUI_WS_W/2 - 75 + SFGUI_WS_W/6, SFGUI_WS_H/6 - 25));
 	
-
 	test2->SetImage(image_map["medium"]);
 	test2->SetRequisition(sf::Vector2f());
-	fixed_tests->Put(test2, sf::Vector2f(100, 200));
+	fixed_tests->Put(test2, sf::Vector2f(SFGUI_WS_W/2 - 75 + SFGUI_WS_W/6, SFGUI_WS_H/6 - 25 + SFGUI_WS_H/6));
 
+	test3->SetImage(image_map["hard"]);
+	test3->SetRequisition(sf::Vector2f());
+	fixed_tests->Put(test3, sf::Vector2f(SFGUI_WS_W/2 - 75 + SFGUI_WS_W/6, SFGUI_WS_H/6 - 25 + SFGUI_WS_H/6*2));
+
+	test4->SetImage(image_map["final"]);
+	test4->SetRequisition(sf::Vector2f());
+	fixed_tests->Put(test4, sf::Vector2f(SFGUI_WS_W/2 - 75 + SFGUI_WS_W/6, SFGUI_WS_H/6 - 25 + SFGUI_WS_H/6*3));
+
+
+	test1->GetSignal(sfg::Widget::OnLeftClick ).Connect([&]{
+			
+		#if defined(__windows)
+		system("start https://docs.google.com/forms/d/1VO2b0hD3EgKVc0vJ7L0sn9SWkGqAGFIBHREkaVivhiY/edit?fbzx=-1838048315125321500");
+		#elif defined(__linux)
+		system("xdg-open https://docs.google.com/forms/d/1VO2b0hD3EgKVc0vJ7L0sn9SWkGqAGFIBHREkaVivhiY/edit?fbzx=-1838048315125321500");
+		#endif
+	});
 
 	test2->GetSignal(sfg::Widget::OnLeftClick ).Connect([&]{
 			
@@ -150,19 +160,35 @@ void Hotwire::init(){
 		#endif
 	});
 
-	test1->SetImage(image_map["easy"]);	
-	test1->SetRequisition(sf::Vector2f());
-	fixed_tests->Put(test1, sf::Vector2f(100, 300));
-
-	test1->GetSignal(sfg::Widget::OnLeftClick ).Connect([&]{
-			
-		#if defined(__windows)
-		system("start https://docs.google.com/forms/d/1VO2b0hD3EgKVc0vJ7L0sn9SWkGqAGFIBHREkaVivhiY/edit?fbzx=-1838048315125321500");
-		#elif defined(__linux)
-		system("xdg-open https://docs.google.com/forms/d/1VO2b0hD3EgKVc0vJ7L0sn9SWkGqAGFIBHREkaVivhiY/edit?fbzx=-1838048315125321500");
+	test3->GetSignal(sfg::Widget::OnLeftClick ).Connect([&]{
+		#ifdef __windows
+		system("start https://docs.google.com/forms/d/e/1FAIpQLSdHLbhNACd_BLx5kzW5miylS2i2VIrAbTLFx7IMT2ykSXTPmQ/viewform");
+		#endif
+		#ifdef __linux
+		system("xdg-open https://docs.google.com/forms/d/e/1FAIpQLSdHLbhNACd_BLx5kzW5miylS2i2VIrAbTLFx7IMT2ykSXTPmQ/viewform");
 		#endif
 	});
 
+	
+	test4->GetSignal(sfg::Widget::OnLeftClick ).Connect([&]{
+		#ifdef __windows
+		system("start https://docs.google.com/forms/d/e/1FAIpQLSdcvFaj8gCGJGrXjttXi4eM90bXwUnAHK-RmxOZpPVnTzVv8A/viewform?usp=sf_link");
+		#endif
+		#ifdef __linux
+		system("xdg-open https://docs.google.com/forms/d/e/1FAIpQLSdcvFaj8gCGJGrXjttXi4eM90bXwUnAHK-RmxOZpPVnTzVv8A/viewform?usp=sf_link");
+		#endif
+	});
+
+
+	backToMenu1->SetImage(image_map["exit1"]);
+	backToMenu1->SetRequisition();
+	backToMenu1->GetSignal(sfg::Widget::OnLeftClick ).Connect([&]{
+			desktop.BringToFront(sfgui_window_menu);	
+			state = "menu";
+	});
+
+	fixed_tests->Put(backToMenu1, sf::Vector2f(SFGUI_WS_W/4 - backToMenu->GetAllocation().width, SFGUI_WS_H/4 - backToMenu->GetAllocation().height));
+	fixed_tests->Put(canvas_background_tests, sf::Vector2f());	
 	Start->SetImage(image_map["start"]);
 	Start->SetRequisition(sf::Vector2f());
 	fixed_menu->Put(Start, sf::Vector2f(SFGUI_WS_W/2 - 75 + SFGUI_WS_W/6, SFGUI_WS_H/6 - 25));
@@ -207,6 +233,7 @@ void Hotwire::init(){
 	desktop.Add(sfgui_window_about);
 	desktop.Add(sfgui_window_tests);
 	desktop.Add(sfgui_window_menu);
+
 
 /////////
     box->Pack(boxIN, false, false);

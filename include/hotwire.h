@@ -26,6 +26,7 @@ class Hotwire{
 		sfg::Canvas::Ptr canvas = sfg::Canvas::Create();
 		sfg::Canvas::Ptr canvas_background = sfg::Canvas::Create();
 		sfg::Canvas::Ptr canvas_background_start = sfg::Canvas::Create();
+		sfg::Canvas::Ptr canvas_background_tests = sfg::Canvas::Create();
 
 		sfg::Desktop desktop;
 
@@ -55,8 +56,10 @@ class Hotwire{
 		sfg::Button::Ptr test1 = sfg::Button::Create();
 		sfg::Button::Ptr test2 = sfg::Button::Create();
 		sfg::Button::Ptr test3 = sfg::Button::Create();
+		sfg::Button::Ptr test4 = sfg::Button::Create();
 
 		sfg::Button::Ptr backToMenu = sfg::Button::Create();
+		sfg::Button::Ptr backToMenu1= sfg::Button::Create();
 
 		sfg::Fixed::Ptr fixed_menu = sfg::Fixed::Create();
 		sfg::Fixed::Ptr fixed_tests = sfg::Fixed::Create();
